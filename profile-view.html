@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>profile — SocialHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Quicksand:wght@500;600&family=Source+Serif+4:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F0EDE5;
+    --surface: rgba(255,255,255,0.65);
+    --ink: #2A2622;
+    --ink-soft: #7A6E68;
+    --ink-faint: #b0a89f;
+    --line: rgba(42,38,34,0.12);
+    --accent: #7A8B6F;
+    --accent-2: #C98B7A;
+    --tag-bg: rgba(122,139,111,0.12);
+    --tag-border: rgba(122,139,111,0.3);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    min-height: 100vh;
+    transition: background 0.3s;
+  }
+
+  /* visitor bar */
+  .visitor-bar {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    background: #1E1D22;
+    border: 1px solid #36343C;
+    border-radius: 99px;
+    padding: 10px 10px 10px 18px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    white-space: nowrap;
+  }
+  .visitor-bar .vb-text { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #9C98A6; }
+  .visitor-bar .vb-text span { color: #ECE9E2; }
+  .vb-btn {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+    padding: 8px 18px; border-radius: 99px; border: none; cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .vb-btn.follow { background: #D9A441; color: #1a1408; }
+  .vb-btn.follow:hover { background: #e6b556; }
+  .vb-btn.following { background: rgba(78,205,196,0.12); color: #4ECDC4; border: 1px solid rgba(78,205,196,0.3); }
+  .vb-btn.following:hover { background: rgba(78,205,196,0.2); }
+  .vb-msg {
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+    padding: 8px 14px; border-radius: 99px; border: 1px solid #36343C;
+    background: transparent; color: #9C98A6; cursor: pointer;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+    transition: all 0.12s;
+  }
+  .vb-msg:hover { border-color: #9C98A6; color: #ECE9E2; }
+  .vb-back { font-family: 'Inter', sans-serif; font-size: 12.5px; color: #6b6776; text-decoration: none; }
+  .vb-back:hover { color: #9C98A6; }
+
+  /* canvas */
+  .canvas { max-width: 680px; margin: 0 auto; padding: 48px 24px 160px; }
+
+  /* blocks */
+  .block {
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 24px;
+    margin-bottom: 16px;
+  }
+  .block-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1px;
+    color: var(--ink-faint); margin-bottom: 12px;
+  }
+
+  .hero-row { display: flex; gap: 20px; align-items: center; }
+  .avatar {
+    width: 80px; height: 80px; border-radius: 14px;
+    background: var(--avatar-grad, linear-gradient(135deg, #7A8B6F, #C98B7A));
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 32px;
+  }
+  .name { font-size: 26px; font-weight: 600; line-height: 1.15; }
+  .tagline { font-size: 15px; color: var(--ink-soft); margin-top: 6px; line-height: 1.6; }
+
+  .body-text { font-size: 15px; line-height: 1.75; color: var(--ink); }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .tag {
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 6px 12px;
+    background: var(--tag-bg); color: var(--ink);
+    border: 1px solid var(--tag-border); border-radius: 7px;
+  }
+
+  .block-list { list-style: none; }
+  .block-list li { padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--line); }
+  .block-list li:last-child { border-bottom: none; }
+  .block-list li::before { content: '— '; color: var(--ink-faint); }
+
+  .link-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 14px;
+    text-decoration: none; color: var(--ink); transition: color 0.12s;
+  }
+  .link-row:last-child { border-bottom: none; }
+  .link-row:hover { color: var(--accent); }
+  .link-row .arrow { color: var(--ink-faint); }
+  .link-row:hover .arrow { color: var(--accent); }
+
+  .view-count {
+    text-align: center; font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: var(--ink-faint); margin-top: 12px;
+  }
+
+  /* dark-theme blocks for gig poster / musician */
+  body.dark-profile .block {
+    background: var(--surface);
+    border-color: var(--line);
+  }
+</style>
+</head>
+<body>
+
+<div class="canvas" id="canvas">
+  <!-- populated by JS -->
+</div>
+
+<div class="visitor-bar" id="visitor-bar">
+  <span class="vb-text">viewing <span id="vb-handle">@profile</span></span>
+  <a href="browse-mockup.html" class="vb-back">&larr; browse</a>
+  <a href="messages.html" class="vb-msg" id="msg-btn" style="display:none;">&#128172; message</a>
+  <button class="vb-btn follow" id="follow-btn">Follow</button>
+</div>
+
+<script>
+  // =====================================================================
+  // PROFILE DATA
+  // =====================================================================
+  const PROFILES = {
+    marisol: {
+      title: 'marisol — SocialHub',
+      handle: '@windowsillwitch',
+      name: 'Marisol',
+      emoji: '🌿',
+      tagline: 'Slow living enthusiast. I grow things and make things and try not to doom-scroll.',
+      about: 'Five years in social work, nights spent in the garden. I make jam in the summer and soup in the winter. I believe in handwriting letters and letting dough rise overnight. If you found me through the slow-living tag: hi, you found your people.',
+      currently: [
+        'Reading — <em>The Living Mountain</em> by Nan Shepherd',
+        'Growing — four types of basil, one struggling fig',
+        'Learning — natural dye processes (goldenrod + iron)',
+        'Listening to — Brigid Mae Power on repeat'
+      ],
+      tags: ['slow-living','plant-care','natural-dye','cottagecore','fermentation','folk-music','letter-writing'],
+      links: ['Substack — letters & seasonal notes','Ko-fi — buy me a seed packet'],
+      views: '84 profile views · joined may 2026',
+      darkProfile: false,
+      css: {
+        bg: '#F0EDE5', surface: 'rgba(255,255,255,0.65)', ink: '#2A2622',
+        inkSoft: '#7A6E68', inkFaint: '#b0a89f', line: 'rgba(42,38,34,0.12)',
+        accent: '#7A8B6F', accent2: '#C98B7A',
+        tagBg: 'rgba(122,139,111,0.12)', tagBorder: 'rgba(122,139,111,0.3)',
+        avatarGrad: 'linear-gradient(135deg,#8A9A6E,#C98B7A)', font: "'Quicksand',sans-serif"
+      }
+    },
+    joaquin: {
+      title: 'lowendjoaquin — SocialHub',
+      handle: '@lowendjoaquin',
+      name: 'Joaquin',
+      emoji: '🎸',
+      tagline: 'Bedroom producer scoring my first indie game. Seattle dive bars and analog gear.',
+      about: "Played bass in three bands that never toured and produced beats nobody heard until someone did. Now I'm helping score a tiny Godot game for a friend. I like the Seattle dive bar scene, analog gear, and handwritten set lists. Looking to connect with people making stuff in the margins.",
+      currently: [
+        'Working on — a 12-track EP for an indie game (Godot)',
+        'Listening to — a lot of Grouper and Tim Hecker lately',
+        'Recording — drums in a friend\'s practice space',
+        'Looking for — a lyricist or collaborator'
+      ],
+      tags: ['music','gig-posters','seattle-shows','home-recording','game-dev','bass','lo-fi'],
+      links: ['SoundCloud — rough cuts and demos','Bandcamp — EP when it drops'],
+      views: '31 profile views · joined jun 2026',
+      darkProfile: true,
+      css: {
+        bg: '#1A0F2E', surface: 'rgba(37,22,64,0.85)', ink: '#ECE9E2',
+        inkSoft: '#9C98A6', inkFaint: '#6b6776', line: 'rgba(232,51,107,0.2)',
+        accent: '#E8336B', accent2: '#E8B339',
+        tagBg: 'rgba(232,51,107,0.1)', tagBorder: 'rgba(232,51,107,0.3)',
+        avatarGrad: 'linear-gradient(135deg,#E8336B,#251640)', font: "'Inter',sans-serif"
+      }
+    },
+    desmond: {
+      title: 'd.okafor — SocialHub',
+      handle: '@d.okafor',
+      name: 'Desmond Okafor',
+      emoji: '📜',
+      tagline: 'Archivist. Can a text game teach you to read a finding aid? Trying to find out.',
+      about: "I work in a university special collections department. On evenings I make zines and prototype games that use archival logic — navigating finding aids, encountering redacted documents, making sense of what was kept and what wasn't. Reach out if you're into experimental education or printmaking.",
+      currently: [
+        'Researching — archive literacy in interactive media',
+        'Making — a zine on records management as world-building',
+        'Playing — <em>Heaven\'s Vault</em> and <em>Orwell</em> (2016)',
+        'Visiting — Pacific Northwest Archivists conference'
+      ],
+      tags: ['archives','zines','printmaking','game-dev','history','libraries','redaction'],
+      links: ['Zine archive — past publications','Itch.io — prototype builds'],
+      views: '52 profile views · joined apr 2026',
+      darkProfile: false,
+      css: {
+        bg: '#EFE9DC', surface: 'rgba(239,233,220,0.9)', ink: '#2A2622',
+        inkSoft: '#6A5C50', inkFaint: '#9d8e80', line: 'rgba(42,38,34,0.14)',
+        accent: '#A6542D', accent2: '#2A2622',
+        tagBg: 'rgba(166,84,45,0.1)', tagBorder: 'rgba(166,84,45,0.3)',
+        avatarGrad: 'linear-gradient(135deg,#A6542D,#EFE9DC)', font: "'Inter',sans-serif"
+      }
+    },
+    mira: {
+      title: 'glittertrash — SocialHub',
+      handle: '@glittertrash',
+      name: 'Mira',
+      emoji: '✨',
+      tagline: 'Collage artist making a small narrative mini-game about strip mall signage.',
+      about: 'I work in layers — literally. Physical collage, digital collage, narrative collage. The mini-game is basically me trying to figure out why certain strip mall signs make me feel things. Maximalism is a philosophy.',
+      currently: [
+        'Building — narrative mini-game in Twine',
+        'Collecting — vintage signage photos',
+        'Reading — <em>Simulacra and Simulation</em> (again)',
+        'Making — a zine about 24-hour laundromats'
+      ],
+      tags: ['maximalist','collage','game-dev','diy','3d-art','fanfic','strip-malls'],
+      links: ['Itch.io — games and experiments','Instagram — the collage work'],
+      views: '67 profile views · joined may 2026',
+      darkProfile: true,
+      css: {
+        bg: '#1A0821', surface: 'rgba(76,91,255,0.2)', ink: '#FFE94A',
+        inkSoft: '#d4c8ff', inkFaint: '#8a7fcc', line: 'rgba(255,46,136,0.25)',
+        accent: '#FF2E88', accent2: '#FFE94A',
+        tagBg: 'rgba(255,46,136,0.12)', tagBorder: 'rgba(255,46,136,0.3)',
+        avatarGrad: 'linear-gradient(135deg,#FF2E88,#4C5BFF)', font: "'Inter',sans-serif"
+      }
+    }
+  };
+
+  // =====================================================================
+  // APPLY PROFILE
+  // =====================================================================
+  const who = new URLSearchParams(window.location.search).get('who') || 'marisol';
+
+  // ---- PREVIEW MODE: render live editor content from localStorage ----
+  if (who === 'preview') {
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    const saved = JSON.parse(localStorage.getItem('sh_profile') || '[]');
+    let html = '';
+    saved.forEach(function(d) {
+      const label = d.label || d.type || '';
+      let content = '';
+      if (d.type === 'identity') {
+        const isCircle = d.avatarShape === 'circle';
+        const avStyle = d.avatar
+          ? 'background-image:url(' + d.avatar + ');background-size:cover;background-position:center;border-radius:' + (isCircle ? '50%' : '14px') + ';'
+          : '';
+        content = '<div class="hero-row"><div class="avatar" style="' + avStyle + '">' + (d.avatar ? '' : '?') + '</div>'
+          + '<div><div class="name">' + esc(d.name || 'Your Name') + '</div>'
+          + '<div class="tagline">' + esc(d.tagline || '') + '</div></div></div>';
+      } else if (d.type === 'text' || d.type === 'custom') {
+        content = '<div class="body-text">' + esc(d.body || '') + '</div>';
+      } else if (d.type === 'tags') {
+        content = '<div class="tags">' + (d.tags || []).map(function(t){ return '<span class="tag">' + esc(t) + '</span>'; }).join('') + '</div>';
+      } else if (d.type === 'list') {
+        content = '<ul class="block-list">' + (d.items || []).map(function(i){ return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>';
+      } else if (d.type === 'links') {
+        content = (d.links || []).map(function(l){ return '<a class="link-row" href="#"><span>' + esc(l) + '</span><span class="arrow">&#8594;</span></a>'; }).join('');
+      } else if (d.type === 'music') {
+        content = '<div style="font-size:13px;color:var(--ink-faint);text-align:center;padding:8px 0;">&#9835; spotify now playing</div>';
+      } else { return; }
+
+      const bStyle = d.bg ? 'background:' + d.bg + ';' : '';
+      const lStyle = d.labelColor ? 'color:' + d.labelColor + ';' : '';
+      html += '<div class="block" style="' + bStyle + '"><div class="block-label" style="' + lStyle + '">' + esc(label) + '</div>' + content + '</div>';
+    });
+
+    document.getElementById('canvas').innerHTML = html || '<p style="text-align:center;padding:64px;opacity:0.45;font-family:\'JetBrains Mono\',monospace;font-size:12px;">nothing to preview yet — go add some blocks</p>';
+    document.title = 'preview — SocialHub';
+    document.getElementById('vb-handle').textContent = '(preview)';
+    var backLink = document.querySelector('.vb-back');
+    backLink.setAttribute('href', 'editor-mockup.html');
+    backLink.textContent = '← back to editor';
+    document.getElementById('follow-btn').style.display = 'none';
+  } else {
+
+  const p = PROFILES[who] || PROFILES.marisol;
+
+  document.title = p.title;
+  document.getElementById('vb-handle').textContent = p.handle;
+
+  // Apply CSS variables
+  const r = document.documentElement;
+  r.style.setProperty('--bg',         p.css.bg);
+  r.style.setProperty('--surface',    p.css.surface);
+  r.style.setProperty('--ink',        p.css.ink);
+  r.style.setProperty('--ink-soft',   p.css.inkSoft);
+  r.style.setProperty('--ink-faint',  p.css.inkFaint);
+  r.style.setProperty('--line',       p.css.line);
+  r.style.setProperty('--accent',     p.css.accent);
+  r.style.setProperty('--accent-2',   p.css.accent2);
+  r.style.setProperty('--tag-bg',     p.css.tagBg);
+  r.style.setProperty('--tag-border', p.css.tagBorder);
+  r.style.setProperty('--avatar-grad',p.css.avatarGrad);
+  document.body.style.fontFamily = p.css.font;
+  if (p.darkProfile) document.body.classList.add('dark-profile');
+
+  // Build HTML
+  const currentlyItems = p.currently.map(li => `<li>${li}</li>`).join('');
+  const tagItems = p.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  const linkItems = p.links.map(l => `<a class="link-row" href="#"><span>${l}</span><span class="arrow">&#8594;</span></a>`).join('');
+
+  document.getElementById('canvas').innerHTML = `
+    <div class="block">
+      <div class="block-label">identity</div>
+      <div class="hero-row">
+        <div class="avatar">${p.emoji}</div>
+        <div>
+          <div class="name">${p.name}</div>
+          <div class="tagline">${p.tagline}</div>
+        </div>
+      </div>
+    </div>
+    <div class="block">
+      <div class="block-label">about</div>
+      <div class="body-text">${p.about}</div>
+    </div>
+    <div class="block">
+      <div class="block-label">currently</div>
+      <ul class="block-list">${currentlyItems}</ul>
+    </div>
+    <div class="block">
+      <div class="block-label">find me through</div>
+      <div class="tags">${tagItems}</div>
+    </div>
+    <div class="block">
+      <div class="block-label">links</div>
+      ${linkItems}
+    </div>
+    <div class="view-count">${p.views}</div>
+  `;
+
+  // =====================================================================
+  // FOLLOW BUTTON
+  // =====================================================================
+  const followBtn = document.getElementById('follow-btn');
+  const msgBtn    = document.getElementById('msg-btn');
+  let following = false;
+  followBtn.addEventListener('click', () => {
+    following = !following;
+    if (following) {
+      followBtn.textContent = 'Following ✓';
+      followBtn.className = 'vb-btn following';
+      msgBtn.style.display = 'inline-flex';
+    } else {
+      followBtn.textContent = 'Follow';
+      followBtn.className = 'vb-btn follow';
+      msgBtn.style.display = 'none';
+    }
+  });
+
+  } // end else (non-preview profiles)
+</script>
+</body>
+</html>

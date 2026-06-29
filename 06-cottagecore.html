@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Marisol's profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;1,9..144,500&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F6F1E4;
+    --surface: #FBF8EF;
+    --sage: #7E9468;
+    --sage-deep: #4F6B3F;
+    --rose: #C98B7A;
+    --ink: #4A4438;
+    --ink-soft: #8c8470;
+    --line: #E3DCC6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family:'Quicksand',sans-serif;
+    min-height:100vh;
+    padding: 44px 24px 90px;
+  }
+  .page{ max-width: 760px; margin:0 auto; }
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 36px; font-size:13px; color: var(--ink-soft);
+  }
+  .topbar .mark{ color: var(--sage-deep); font-weight:600; }
+  .topnav{ display:flex; gap:18px; }
+  .topnav span.active{ color: var(--sage-deep); font-weight:600; }
+
+  .hero{
+    background: var(--surface); border-radius: 24px; padding: 36px 38px;
+    margin-bottom: 26px; border: 1px solid var(--line);
+  }
+  .name{ font-family:'Fraunces',serif; font-style:italic; font-weight:500; font-size:42px; color: var(--sage-deep); }
+  .handle{ font-size:13px; color: var(--rose); margin-top:6px; font-weight:500; }
+  .tagline{ font-size:16px; color: var(--ink); margin-top:16px; line-height:1.6; max-width:460px; }
+
+  .divider{
+    text-align:center; color: var(--sage); font-size:14px; margin: 28px 0; opacity:0.6;
+  }
+
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .card{
+    background: var(--surface); border-radius: 20px; padding: 24px 26px;
+    border: 1px solid var(--line);
+  }
+  .card.full{ grid-column: 1/-1; }
+  .card h2{
+    font-family:'Fraunces',serif; font-style:italic; font-size:18px; color: var(--sage-deep);
+    margin-bottom: 12px;
+  }
+  .card p{ font-size:14.5px; line-height:1.7; color: var(--ink); }
+
+  .plant-list{ list-style:none; }
+  .plant-list li{
+    display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--line);
+    font-size:14px;
+  }
+  .plant-list li:last-child{ border-bottom:none; }
+  .plant-status{ font-size:12px; color: var(--sage-deep); font-weight:600; }
+
+  .tags{ display:flex; flex-wrap:wrap; gap:10px; }
+  .tag{
+    font-size:13px; padding:7px 14px; border-radius:99px; cursor:pointer;
+    background: #EDE6D2; color: var(--sage-deep); font-weight:500;
+    border:1px solid var(--line); transition: transform 0.12s ease;
+  }
+  .tag:hover{ transform: translateY(-1px); }
+  .tag:active{ transform: scale(0.95); }
+  .tag.rose{ background: #F3E3DD; color: #9C5A48; }
+
+  .footnote{
+    margin-top: 32px; text-align:center; font-size:12.5px; color: var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div><span class="mark">/</span>forge</div>
+    <div class="topnav">
+      <span>browse</span>
+      <span class="active">profile</span>
+      <span>messages</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="name">Marisol</div>
+    <div class="handle">@windowsillwitch</div>
+    <div class="tagline">137 plants and counting, most of them named. I propagate more than I probably should and I will absolutely send you a cutting if you ask nicely.</div>
+  </div>
+
+  <div class="divider">⋆ ⋆ ⋆</div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>about me</h2>
+      <p>Apartment balcony turned into a small jungle. I work from home doing bookkeeping, which means I check on my plants embarrassingly often.</p>
+    </div>
+
+    <div class="card">
+      <h2>windowsill report</h2>
+      <ul class="plant-list">
+        <li><span>Monstera, "Gerald"</span><span class="plant-status">thriving</span></li>
+        <li><span>Fiddle leaf fig</span><span class="plant-status">sulking</span></li>
+        <li><span>Pothos cuttings ×6</span><span class="plant-status">rooting</span></li>
+      </ul>
+    </div>
+
+    <div class="card full">
+      <h2>interests</h2>
+      <div class="tags">
+        <span class="tag">#houseplants</span>
+        <span class="tag rose">#propagation</span>
+        <span class="tag">#slow-living</span>
+        <span class="tag rose">#ceramics</span>
+        <span class="tag">#tea</span>
+        <span class="tag rose">#cottagecore</span>
+        <span class="tag">#sunday-baking</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">grown and tended by marisol — no algorithm waters these</div>
+
+</div>
+</body>
+</html>

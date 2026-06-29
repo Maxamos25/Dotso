@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dotso — dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<style>
+  :root{
+    --bg:#16151A; --surface:#1E1D22; --surface-2:#26252B;
+    --ink:#ECE9E2; --ink-soft:#9C98A6; --ink-faint:#6b6776;
+    --line:#36343C; --amber:#D9A441; --amber-dim:#3a3022;
+    --success:#4ECDC4;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ background:var(--bg); font-family:'Inter',sans-serif; color:var(--ink); overflow:hidden; height:100vh; }
+
+  /* ===== profile iframe behind ===== */
+  .profile-bg{
+    position:fixed; inset:0; width:100%; height:100%;
+    border:none; z-index:0; pointer-events:none;
+  }
+
+  /* ===== frosted overlay ===== */
+  .dash-overlay{
+    position:fixed; inset:0; z-index:10;
+    background:rgba(16,15,20,0.6);
+    backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
+    display:flex; flex-direction:column;
+    transition:opacity 0.35s ease, transform 0.35s ease;
+  }
+  .dash-overlay.dismissed{
+    opacity:0; pointer-events:none; transform:translateY(16px);
+  }
+
+  /* ===== overlay nav ===== */
+  .dash-nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:18px 28px;
+    border-bottom:1px solid rgba(255,255,255,0.07);
+    flex-shrink:0;
+  }
+  .dash-logo{ font-weight:700; font-size:15px; text-decoration:none; color:var(--ink); }
+  .dash-logo span{ color:var(--ink-faint); }
+  .dash-nav-right{ display:flex; align-items:center; gap:10px; }
+  .dash-nav-btn{
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    padding:7px 14px; border-radius:8px;
+    border:1px solid rgba(255,255,255,0.12); background:transparent;
+    color:var(--ink-soft); cursor:pointer; text-decoration:none;
+    transition:all 0.12s;
+  }
+  .dash-nav-btn:hover{ border-color:rgba(255,255,255,0.25); color:var(--ink); }
+  .dash-view-btn{
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    padding:7px 16px; border-radius:8px;
+    border:none; background:var(--amber); color:#1a1408;
+    cursor:pointer; font-weight:600; transition:filter 0.12s;
+  }
+  .dash-view-btn:hover{ filter:brightness(1.1); }
+
+  /* ===== overlay content ===== */
+  .dash-content{
+    flex:1; overflow-y:auto;
+    display:flex; flex-direction:column; align-items:center;
+    padding:36px 24px 48px;
+  }
+  .dash-inner{ width:100%; max-width:520px; display:flex; flex-direction:column; gap:28px; }
+
+  /* greeting */
+  .dash-greeting{ }
+  .dash-date{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    text-transform:uppercase; letter-spacing:1.2px;
+    color:var(--ink-faint); margin-bottom:8px;
+  }
+  .dash-name{ font-size:28px; font-weight:700; letter-spacing:-0.5px; }
+  .dash-sub{ font-size:14px; color:var(--ink-soft); margin-top:4px; }
+
+  /* stats */
+  .stat-row{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:12px;
+  }
+  .stat-card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:16px 18px;
+    position:relative; overflow:hidden;
+  }
+  .stat-card::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  }
+  .stat-card.s-following::before{ background:var(--amber); }
+  .stat-card.s-followers::before{ background:var(--success); }
+  .stat-card.s-views::before{ background:#7A8B6F; }
+  .stat-label{
+    font-family:'JetBrains Mono',monospace; font-size:9.5px;
+    text-transform:uppercase; letter-spacing:1px;
+    color:var(--ink-faint); margin-bottom:8px;
+  }
+  .stat-num{ font-size:30px; font-weight:700; letter-spacing:-1px; line-height:1; }
+  .stat-card.s-following .stat-num{ color:var(--amber); }
+  .stat-card.s-followers .stat-num{ color:var(--success); }
+  .stat-card.s-views .stat-num{ color:#9db891; }
+
+  /* actions */
+  .action-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .action-card{
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:12px; padding:16px 18px;
+    text-decoration:none; color:inherit;
+    display:flex; align-items:center; gap:14px;
+    transition:background 0.12s, border-color 0.12s;
+    cursor:pointer;
+  }
+  .action-card:hover{ background:rgba(255,255,255,0.07); border-color:rgba(255,255,255,0.16); }
+  .action-icon{
+    width:38px; height:38px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:17px; flex-shrink:0;
+  }
+  .action-icon.edit    { background:var(--amber-dim); color:var(--amber); }
+  .action-icon.browse  { background:rgba(78,205,196,0.12); color:var(--success); }
+  .action-icon.messages{ background:rgba(122,139,111,0.15); color:#7A8B6F; }
+  .action-icon.inspo   { background:rgba(255,255,255,0.06); color:var(--ink-soft); }
+  .action-text{ flex:1; }
+  .action-name{ font-weight:600; font-size:13.5px; margin-bottom:2px; }
+  .action-desc{ font-size:12px; color:var(--ink-faint); }
+
+  /* inspiration tab inside overlay */
+  .inspo-section{ display:none; }
+  .inspo-section.active{ display:block; }
+  .section-title{
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    text-transform:uppercase; letter-spacing:1px;
+    color:var(--ink-faint); margin-bottom:12px;
+  }
+  .inspo-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .inspo-card{
+    background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px; padding:14px 16px;
+  }
+  .inspo-type{
+    font-family:'JetBrains Mono',monospace; font-size:9px;
+    text-transform:uppercase; letter-spacing:0.5px;
+    color:var(--ink-faint); margin-bottom:4px;
+  }
+  .inspo-label{ font-size:12.5px; font-weight:600; margin-bottom:4px; }
+  .inspo-preview{
+    font-size:11.5px; color:var(--ink-soft); line-height:1.5;
+    overflow:hidden; display:-webkit-box;
+    -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical;
+    margin-bottom:10px;
+  }
+  .inspo-actions{ display:flex; gap:6px; }
+  .inspo-use-btn{
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    padding:4px 10px; border-radius:5px;
+    border:1px solid var(--amber); background:transparent; color:var(--amber);
+    cursor:pointer; transition:background 0.12s;
+  }
+  .inspo-use-btn:hover{ background:var(--amber-dim); }
+  .inspo-remove-btn{
+    font-size:11px; padding:4px 8px; border-radius:5px;
+    border:1px solid rgba(255,255,255,0.1); background:transparent;
+    color:var(--ink-faint); cursor:pointer; margin-left:auto;
+    transition:all 0.12s;
+  }
+  .inspo-remove-btn:hover{ border-color:rgba(220,60,60,0.5); color:#e05c5c; }
+  .inspo-empty{
+    text-align:center; padding:28px 16px;
+    color:var(--ink-faint); font-size:13px; line-height:1.6;
+    background:rgba(255,255,255,0.03); border-radius:10px;
+    border:1px dashed rgba(255,255,255,0.08);
+  }
+
+  /* view-profile floating button (when overlay dismissed) */
+  .dash-show-btn{
+    position:fixed; bottom:28px; right:28px; z-index:20;
+    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
+    padding:11px 20px; border-radius:99px;
+    background:rgba(30,29,34,0.9); border:1px solid rgba(255,255,255,0.14);
+    color:var(--ink); cursor:pointer;
+    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+    transition:all 0.2s; opacity:0; pointer-events:none;
+    box-shadow:0 4px 20px rgba(0,0,0,0.4);
+  }
+  .dash-show-btn.visible{ opacity:1; pointer-events:all; }
+
+  /* notif bar */
+  .notif-bar{
+    background:rgba(78,205,196,0.08); border:1px solid rgba(78,205,196,0.2);
+    border-radius:10px; padding:12px 16px;
+    display:flex; align-items:center; gap:12px;
+    font-size:13px;
+  }
+  .notif-text{ flex:1; }
+  .notif-text strong{ color:var(--success); }
+  .notif-dismiss{
+    color:var(--ink-faint); cursor:pointer; font-size:13px;
+    background:none; border:none;
+  }
+
+  @media(max-width:520px){
+    .stat-row{ grid-template-columns:1fr 1fr; }
+    .action-grid{ grid-template-columns:1fr; }
+    .dash-name{ font-size:22px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Profile renders behind the overlay -->
+<iframe class="profile-bg" id="profile-frame" src="editor-mockup.html?preview=1" title="your profile"></iframe>
+
+<!-- Frosted dashboard overlay -->
+<div class="dash-overlay" id="dash-overlay">
+
+  <div class="dash-nav">
+    <a class="dash-logo" href="#"><span>/</span>dotso</a>
+    <div class="dash-nav-right">
+      <span class="dash-nav-btn nav-handle">@—</span>
+      <button class="dash-nav-btn" onclick="doSignOut()">sign out</button>
+      <button class="dash-view-btn" onclick="dismissOverlay()">view my profile →</button>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    <div class="dash-inner">
+
+      <!-- Notification -->
+      <div class="notif-bar" id="notif">
+        <span>🎉</span>
+        <div class="notif-text"><strong>marisol</strong> started following you</div>
+        <button class="notif-dismiss" onclick="this.closest('#notif').remove()">✕</button>
+      </div>
+
+      <!-- Greeting -->
+      <div class="dash-greeting">
+        <div class="dash-date" id="dash-date"></div>
+        <div class="dash-name" id="dash-name">Hey.</div>
+        <div class="dash-sub">Your profile is live.</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stat-row">
+        <div class="stat-card s-followers">
+          <div class="stat-label">followers</div>
+          <div class="stat-num">12</div>
+        </div>
+        <div class="stat-card s-following">
+          <div class="stat-label">following</div>
+          <div class="stat-num">7</div>
+        </div>
+        <div class="stat-card s-views">
+          <div class="stat-label">profile views</div>
+          <div class="stat-num">84</div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="action-grid">
+        <a class="action-card" href="editor-mockup.html">
+          <div class="action-icon edit">✏️</div>
+          <div class="action-text">
+            <div class="action-name">Edit profile</div>
+            <div class="action-desc">Blocks, colors, layout</div>
+          </div>
+        </a>
+        <a class="action-card" href="browse-mockup.html">
+          <div class="action-icon browse">🔍</div>
+          <div class="action-text">
+            <div class="action-name">Browse</div>
+            <div class="action-desc">Find people nearby</div>
+          </div>
+        </a>
+        <a class="action-card" href="messages.html">
+          <div class="action-icon messages">💬</div>
+          <div class="action-text">
+            <div class="action-name">Messages</div>
+            <div class="action-desc">Chat with connections</div>
+          </div>
+        </a>
+        <div class="action-card" onclick="toggleInspo()">
+          <div class="action-icon inspo">♡</div>
+          <div class="action-text">
+            <div class="action-name">Inspiration</div>
+            <div class="action-desc" id="inspo-desc">0 saved blocks</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inspiration section (toggled) -->
+      <div class="inspo-section" id="inspo-section">
+        <div class="section-title">saved inspiration</div>
+        <div class="inspo-grid" id="inspo-grid"></div>
+        <div class="inspo-empty" id="inspo-empty" style="display:none;">
+          Nothing saved yet. Visit a profile and tap ♡ on any block.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Floating button to bring overlay back -->
+<button class="dash-show-btn" id="dash-show-btn" onclick="showOverlay()">☰ dashboard</button>
+
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAj-pIFaW0OuDUfEbaOm_zFhu4fU9kXZbM",
+    authDomain: "dotso-fec33.firebaseapp.com",
+    projectId: "dotso-fec33",
+    storageBucket: "dotso-fec33.firebasestorage.app",
+    messagingSenderId: "202217283559",
+    appId: "1:202217283559:web:8359ebd1844657b720a742"
+  });
+  const _auth = firebase.auth();
+  const _db   = firebase.firestore();
+
+  _auth.onAuthStateChanged(async user => {
+    if (!user) { window.location.href = 'signin.html'; return; }
+
+    // Date
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    const now  = new Date();
+    document.getElementById('dash-date').textContent =
+      days[now.getDay()] + ', ' + now.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+
+    // Handle from Firestore
+    try {
+      const doc = await _db.collection('profiles').doc(user.uid).get();
+      const h = doc.exists && doc.data().handle ? doc.data().handle : user.email.split('@')[0];
+      localStorage.setItem('sh_handle', h);
+      document.querySelectorAll('.nav-handle').forEach(el => el.textContent = '@' + h);
+      document.getElementById('dash-name').textContent = 'Hey, ' + h + '.';
+    } catch(e) {
+      document.getElementById('dash-name').textContent = 'Hey.';
+    }
+
+    updateInspoCount();
+  });
+
+  function doSignOut() { _auth.signOut().then(() => window.location.href = 'signin.html'); }
+
+  function dismissOverlay() {
+    document.getElementById('dash-overlay').classList.add('dismissed');
+    document.getElementById('profile-frame').style.pointerEvents = 'all';
+    document.getElementById('dash-show-btn').classList.add('visible');
+  }
+  function showOverlay() {
+    document.getElementById('dash-overlay').classList.remove('dismissed');
+    document.getElementById('profile-frame').style.pointerEvents = 'none';
+    document.getElementById('dash-show-btn').classList.remove('visible');
+  }
+
+  let inspoOpen = false;
+  function toggleInspo() {
+    inspoOpen = !inspoOpen;
+    const sec = document.getElementById('inspo-section');
+    sec.classList.toggle('active', inspoOpen);
+    if (inspoOpen) renderInspirationTab();
+  }
+
+  function updateInspoCount() {
+    const saved = JSON.parse(localStorage.getItem('sh_inspiration') || '[]');
+    document.getElementById('inspo-desc').textContent = saved.length + ' saved block' + (saved.length !== 1 ? 's' : '');
+  }
+
+  function renderInspirationTab() {
+    const saved = JSON.parse(localStorage.getItem('sh_inspiration') || '[]');
+    const grid  = document.getElementById('inspo-grid');
+    const empty = document.getElementById('inspo-empty');
+    grid.innerHTML = '';
+    if (!saved.length) { grid.style.display = 'none'; empty.style.display = 'block'; return; }
+    grid.style.display = 'grid'; empty.style.display = 'none';
+    saved.forEach(entry => {
+      const card = document.createElement('div');
+      card.className = 'inspo-card';
+      let preview = '';
+      if (entry.type === 'text' || entry.type === 'custom') preview = entry.body || '';
+      else if (entry.type === 'tags')  preview = (entry.tags  || []).join(', ');
+      else if (entry.type === 'list')  preview = (entry.items || []).join(' · ');
+      else if (entry.type === 'links') preview = (entry.links || []).join(', ');
+      const typeEl = document.createElement('div'); typeEl.className = 'inspo-type'; typeEl.textContent = entry.type;
+      const lblEl  = document.createElement('div'); lblEl.className  = 'inspo-label'; lblEl.textContent = entry.label || entry.type;
+      card.appendChild(typeEl); card.appendChild(lblEl);
+      if (preview) { const p = document.createElement('div'); p.className = 'inspo-preview'; p.textContent = preview; card.appendChild(p); }
+      const actions = document.createElement('div'); actions.className = 'inspo-actions';
+      const useBtn = document.createElement('button'); useBtn.className = 'inspo-use-btn'; useBtn.textContent = 'use this →';
+      useBtn.addEventListener('click', () => { localStorage.setItem('sh_use_block', JSON.stringify(entry)); window.location.href = 'editor-mockup.html'; });
+      const rmBtn  = document.createElement('button'); rmBtn.className = 'inspo-remove-btn'; rmBtn.textContent = '✕';
+      rmBtn.addEventListener('click', () => {
+        const list = JSON.parse(localStorage.getItem('sh_inspiration') || '[]');
+        localStorage.setItem('sh_inspiration', JSON.stringify(list.filter(e => e.id !== entry.id)));
+        card.remove(); updateInspoCount();
+        if (!grid.children.length) { grid.style.display = 'none'; empty.style.display = 'block'; }
+      });
+      actions.appendChild(useBtn); actions.appendChild(rmBtn); card.appendChild(actions);
+      if (entry.style?.borderColor) card.style.borderColor = entry.style.borderColor;
+      grid.appendChild(card);
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Desmond's profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EFE9DC;
+    --ink: #2A2622;
+    --ink-soft: #6e6557;
+    --rust: #A6542D;
+    --line: #D4CBB6;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family:'Source Serif 4', serif;
+    min-height: 100vh;
+    padding: 48px 24px 100px;
+  }
+  .page{ max-width: 620px; margin:0 auto; }
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom: 50px; font-family:'JetBrains Mono',monospace; font-size:11px;
+    letter-spacing:0.5px; text-transform:uppercase; color: var(--ink-soft);
+    border-bottom: 1px solid var(--ink); padding-bottom:10px;
+  }
+  .topbar .mark{ color: var(--rust); }
+  .topnav{ display:flex; gap:18px; }
+  .topnav span.active{ color: var(--ink); font-weight:500; }
+
+  .masthead{ text-align:left; margin-bottom: 40px; }
+  .name{ font-size:40px; font-weight:600; line-height:1.1; }
+  .handle{ font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--rust); margin-top:6px; }
+  .role{ font-style:italic; color: var(--ink-soft); font-size:16px; margin-top:14px; }
+
+  .divider{ border-top:1px solid var(--ink); margin: 36px 0; }
+
+  .section-num{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color: var(--rust);
+    margin-bottom:8px; letter-spacing:1px;
+  }
+  .section h2{ font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px; }
+  .section p{ font-size:16.5px; line-height:1.85; margin-bottom: 14px; max-width:540px; }
+  .section{ margin-bottom: 40px; }
+
+  .pub-list{ list-style:none; }
+  .pub-item{ display:flex; gap:16px; padding: 14px 0; border-bottom:1px solid var(--line); }
+  .pub-item:last-child{ border-bottom:none; }
+  .pub-year{ font-family:'JetBrains Mono',monospace; font-size:13px; color: var(--rust); flex-shrink:0; width:48px; }
+  .pub-title{ font-size:15.5px; font-style:italic; }
+  .pub-venue{ font-size:13px; color: var(--ink-soft); margin-top:3px; }
+
+  .tags{ display:flex; flex-wrap:wrap; gap: 10px 22px; }
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:13px; color: var(--ink);
+    border-bottom: 1px solid var(--rust); padding-bottom:2px; cursor:default;
+  }
+
+  .footnote{
+    margin-top: 60px; font-family:'JetBrains Mono',monospace; font-size:11px;
+    color: var(--ink-soft); border-top:1px solid var(--ink); padding-top:18px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div><span class="mark">/</span>forge</div>
+    <div class="topnav">
+      <span>browse</span>
+      <span class="active">profile</span>
+      <span>messages</span>
+    </div>
+  </div>
+
+  <div class="masthead">
+    <div class="name">Desmond Okafor</div>
+    <div class="handle">@d.okafor</div>
+    <div class="role">Independent researcher — labor history of the American Midwest</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-num">01</div>
+    <h2>about</h2>
+    <p>I left a tenure-track position in 2024 to write the book I actually wanted to write. Currently three years into a project on union halls as physical architecture, not just institutions.</p>
+    <p>I'm slow to respond and I mean every word I send. If you want to talk about archives, organizing history, or just argue about footnote conventions, I'm in.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-num">02</div>
+    <h2>recent writing</h2>
+    <ul class="pub-list">
+      <li class="pub-item">
+        <span class="pub-year">2026</span>
+        <div>
+          <div class="pub-title">The Hall as Archive</div>
+          <div class="pub-venue">Essay, Dissent Magazine</div>
+        </div>
+      </li>
+      <li class="pub-item">
+        <span class="pub-year">2025</span>
+        <div>
+          <div class="pub-title">Notes from the Akron Local 5</div>
+          <div class="pub-venue">Newsletter, self-published</div>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-num">03</div>
+    <h2>subjects</h2>
+    <div class="tags">
+      <span class="tag">labor history</span>
+      <span class="tag">archives</span>
+      <span class="tag">midwest</span>
+      <span class="tag">oral history</span>
+      <span class="tag">unions</span>
+      <span class="tag">independent research</span>
+    </div>
+  </div>
+
+  <div class="footnote">page authored directly by desmond — no template defaults left unedited</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Bud's profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #15131A;
+    --surface: #221F28;
+    --surface-2: #29242F;
+    --ember: #FF6B35;
+    --ember-dim: #4a2c1c;
+    --teal: #4ECDC4;
+    --teal-dim: #1c3433;
+    --text: #F4F0E8;
+    --text-muted: #9A93A8;
+    --text-faint: #6b6478;
+    --line: #38333f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.025) 1px, transparent 0);
+    background-size: 22px 22px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 24px 80px;
+  }
+  .page{ max-width: 900px; margin: 0 auto; }
+
+  /* top bar */
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 36px; padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  }
+  .logo{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; letter-spacing:0.5px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .mark{ color: var(--ember); }
+  .topnav{ display:flex; gap:22px; font-size:13px; color: var(--text-muted); font-family:'JetBrains Mono',monospace; }
+  .topnav span{ cursor:default; }
+  .topnav span.active{ color: var(--text); }
+
+  /* hero */
+  .hero{
+    display:grid; grid-template-columns: 132px 1fr; gap: 28px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:5px;
+    background: repeating-linear-gradient(90deg, var(--ember) 0 16px, var(--teal) 16px 32px);
+    opacity: 0.85;
+  }
+  .avatar{
+    width: 132px; height: 132px; border-radius: 10px;
+    background: linear-gradient(160deg, #3a3344, #221f28);
+    border: 1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size: 40px;
+    color: var(--ember);
+  }
+  .hero-main{ display:flex; flex-direction:column; justify-content:center; gap: 10px; }
+  .name-row{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .name{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:30px; }
+  .handle{ font-family:'JetBrains Mono',monospace; color:var(--teal); font-size:14px; }
+  .status-pill{
+    font-family:'JetBrains Mono',monospace; font-size:11px; padding:3px 9px;
+    border:1px solid var(--teal); color:var(--teal); border-radius:99px;
+    display:inline-flex; align-items:center; gap:6px; width:fit-content;
+  }
+  .status-pill .dot{ width:6px;height:6px;border-radius:50%; background:var(--teal); }
+  .tagline{ color:var(--text-muted); font-size:15px; max-width: 480px; line-height:1.5; }
+  .hero-meta{ display:flex; gap:18px; font-size:12px; color:var(--text-faint); font-family:'JetBrains Mono',monospace; margin-top:4px; }
+
+  /* board layout */
+  .board{
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 24px;
+    align-items:start;
+  }
+  .col{ display:flex; flex-direction:column; gap:24px; }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 24px;
+    position: relative;
+  }
+  .card.tilt-l{ transform: rotate(-0.6deg); }
+  .card.tilt-r{ transform: rotate(0.7deg); }
+  .pin{
+    position:absolute; top:-7px; left: 28px; width:14px; height:14px; border-radius:50%;
+    background: var(--ember); box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .card h2{
+    font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;
+    text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-muted);
+    margin-bottom: 14px; display:flex; align-items:center; gap:8px;
+  }
+  .card h2::before{ content:""; width:7px; height:7px; background:var(--ember); border-radius:1px; display:inline-block; }
+  .card p{ font-size:15px; line-height:1.65; color:var(--text); }
+  .card p + p{ margin-top: 10px; }
+
+  /* tags */
+  .tags{ display:flex; flex-wrap:wrap; gap:9px; }
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; padding:6px 12px 6px 10px;
+    background: var(--teal-dim); color: var(--teal); border:1px solid #2a4a47;
+    border-radius:7px; display:inline-flex; align-items:center; gap:6px;
+    cursor:pointer; transition: transform 0.12s ease;
+  }
+  .tag:hover{ transform: translateY(-1px); }
+  .tag:active{ transform: scale(0.96); }
+  .tag .hash{ color:#3a8a83; }
+  .tag.ember{ background: var(--ember-dim); color: var(--ember); border-color:#5c3724; }
+  .tag.ember .hash{ color:#8a4a2e; }
+
+  /* now building list */
+  .build-item{
+    display:flex; gap:14px; padding: 12px 0; border-bottom:1px solid var(--line);
+  }
+  .build-item:last-child{ border-bottom:none; padding-bottom:0; }
+  .build-bar{ width:4px; border-radius:2px; background: var(--ember); flex-shrink:0; }
+  .build-item.done .build-bar{ background: var(--teal); }
+  .build-content{ flex:1; }
+  .build-title{ font-weight:500; font-size:14.5px; margin-bottom:3px; }
+  .build-desc{ font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .build-progress{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color: var(--text-faint); margin-top:6px;
+  }
+
+  /* links */
+  .link-row{
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 11px 0; border-bottom:1px solid var(--line); font-size:14px;
+  }
+  .link-row:last-child{ border-bottom:none; }
+  .link-row a{ color:var(--text); text-decoration:none; }
+  .link-row .arrow{ color:var(--text-faint); font-family:'JetBrains Mono',monospace; }
+
+  /* footer note */
+  .footnote{
+    text-align:center; color:var(--text-faint); font-size:12px; font-family:'JetBrains Mono',monospace;
+    margin-top: 36px; line-height:1.8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div class="logo"><span class="mark">/</span>forge</div>
+    <div class="topnav">
+      <span>browse</span>
+      <span class="active">profile</span>
+      <span>messages</span>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="avatar">BR</div>
+    <div class="hero-main">
+      <div class="name-row">
+        <span class="name">Bud R.</span>
+        <span class="handle">@forgewright</span>
+      </div>
+      <span class="status-pill"><span class="dot"></span>open to chat about modding</span>
+      <p class="tagline">Building custom characters for games that weren't built for them. Skyrim modder, sometimes-sculptor, full-time tinkerer.</p>
+      <div class="hero-meta">
+        <span>WA, US</span>
+        <span>joined 2026</span>
+        <span>14 tags</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="col">
+
+      <div class="card tilt-l">
+        <div class="pin"></div>
+        <h2>about</h2>
+        <p>Seven years behind a register at Costco, four years of nights spent learning Blender, Electron, and whatever it takes to get a custom character to actually load in someone else's game.</p>
+        <p>I like things that are made by hand, even when the hands are typing code. If your profile has a weird hobby on it, I probably want to hear about it.</p>
+      </div>
+
+      <div class="card">
+        <h2>now building</h2>
+        <div class="build-item">
+          <div class="build-bar"></div>
+          <div class="build-content">
+            <div class="build-title">CharacterForge</div>
+            <div class="build-desc">Cross-game custom character portal — Electron + React + Three.js. Starter adapters for Skyrim SE and Blade & Sorcery.</div>
+            <div class="build-progress">[ in progress — targeting steam ]</div>
+          </div>
+        </div>
+        <div class="build-item done">
+          <div class="build-bar"></div>
+          <div class="build-content">
+            <div class="build-title">Blade & Sorcery face presets</div>
+            <div class="build-desc">A small pack of custom face presets, mostly made to see if the pipeline would actually work end to end.</div>
+            <div class="build-progress">[ shipped ]</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card tilt-r">
+        <div class="pin"></div>
+        <h2>links</h2>
+        <div class="link-row"><a href="#">CharacterForge devlog</a><span class="arrow">→</span></div>
+        <div class="link-row"><a href="#">Nexus Mods profile</a><span class="arrow">→</span></div>
+        <div class="link-row"><a href="#">Portfolio (Cornish BFA work)</a><span class="arrow">→</span></div>
+      </div>
+
+    </div>
+
+    <div class="col">
+      <div class="card">
+        <h2>interests</h2>
+        <div class="tags">
+          <span class="tag"><span class="hash">#</span>skyrim-modding</span>
+          <span class="tag ember"><span class="hash">#</span>game-dev</span>
+          <span class="tag"><span class="hash">#</span>blade-and-sorcery</span>
+          <span class="tag ember"><span class="hash">#</span>3d-modeling</span>
+          <span class="tag"><span class="hash">#</span>electron</span>
+          <span class="tag"><span class="hash">#</span>three-js</span>
+          <span class="tag ember"><span class="hash">#</span>character-design</span>
+          <span class="tag"><span class="hash">#</span>indie-dev</span>
+          <span class="tag"><span class="hash">#</span>retro-web</span>
+          <span class="tag ember"><span class="hash">#</span>woodworking</span>
+        </div>
+      </div>
+
+      <div class="card tilt-l">
+        <div class="pin"></div>
+        <h2>currently into</h2>
+        <p style="font-size:14px;">Elden Ring DLC (40 hrs in), figuring out rigging in Blender, and a long-overdue rewatch of cowboy bebop.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footnote">no algorithm decided what you just saw — bud built this page himself</div>
+
+</div>
+</body>
+</html>

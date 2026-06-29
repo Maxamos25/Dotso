@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Joaquin's profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #1A0F2E;
+    --surface: #251640;
+    --magenta: #E8336B;
+    --gold: #E8B339;
+    --paper: #F4EFE3;
+    --line: #3d2a5c;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    color: var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding: 28px 20px 90px;
+  }
+  .page{ max-width: 880px; margin:0 auto; }
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 32px; font-family:'JetBrains Mono',monospace; font-size:12px;
+    color: var(--paper); opacity:0.7;
+  }
+  .topbar .mark{ color: var(--magenta); opacity:1; }
+  .topnav{ display:flex; gap:18px; }
+  .topnav span.active{ color: var(--gold); opacity:1; }
+
+  .poster{
+    background: var(--surface); border: 2px solid var(--magenta);
+    padding: 40px 36px 32px; margin-bottom: 24px; position:relative;
+  }
+  .poster::before{
+    content:""; position:absolute; inset:10px; border:1px solid var(--gold); opacity:0.35; pointer-events:none;
+  }
+  .billing{ font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:3px; color: var(--gold); text-transform:uppercase; margin-bottom:14px; }
+  .name{
+    font-family:'Anton',sans-serif; font-size: 76px; line-height:0.92; color: var(--paper);
+    text-transform:uppercase; letter-spacing:1px;
+  }
+  .name .accent{ color: var(--magenta); }
+  .handle{ font-family:'JetBrains Mono',monospace; font-size:13px; color: var(--gold); margin-top:14px; }
+  .tagline{ font-size:16px; color: var(--paper); opacity:0.85; margin-top:16px; max-width:480px; line-height:1.5; }
+
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
+  .card{
+    background: var(--surface); border:1px solid var(--line); padding:22px 24px;
+  }
+  .card.wide{ grid-column: 1 / -1; }
+  .card h2{
+    font-family:'Anton',sans-serif; font-size:16px; text-transform:uppercase; letter-spacing:1px;
+    color: var(--magenta); margin-bottom:14px;
+  }
+  .card p{ font-size:14.5px; line-height:1.65; color: var(--paper); opacity:0.9; }
+
+  .setlist{ list-style:none; }
+  .setlist li{
+    display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px dashed var(--line);
+    font-size:14px;
+  }
+  .setlist li:last-child{ border-bottom:none; }
+  .setlist .track-num{ font-family:'JetBrains Mono',monospace; color: var(--gold); margin-right:12px; }
+  .setlist .track-meta{ color: var(--paper); opacity:0.5; font-family:'JetBrains Mono',monospace; font-size:12px; }
+
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:4px; }
+  .tag{
+    font-family:'JetBrains Mono',monospace; font-size:12px; padding:6px 12px;
+    border:1px solid var(--magenta); color: var(--magenta); cursor:pointer;
+  }
+  .tag:hover{ background: var(--magenta); color: var(--surface); }
+  .tag:active{ transform: scale(0.95); }
+
+  .footnote{
+    margin-top: 28px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:11px;
+    color: var(--paper); opacity:0.45; letter-spacing:0.5px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div><span class="mark">/</span>forge</div>
+    <div class="topnav">
+      <span>browse</span>
+      <span class="active">profile</span>
+      <span>messages</span>
+    </div>
+  </div>
+
+  <div class="poster">
+    <div class="billing">now playing on this page</div>
+    <div class="name">JOAQUIN<span class="accent">.</span></div>
+    <div class="handle">@lowendjoaquin</div>
+    <div class="tagline">bassist. bedroom producer. four-track demos and not enough sleep. always looking for a drummer who shows up on time.</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>about</h2>
+      <p>Ten years in bar bands around the Sound. Currently solo, producing slow basslines and tape-hiss textures. I'll listen to anything you send me, no exceptions.</p>
+    </div>
+
+    <div class="card">
+      <h2>tags</h2>
+      <div class="tags">
+        <span class="tag">#bass</span>
+        <span class="tag">#dub</span>
+        <span class="tag">#home-recording</span>
+        <span class="tag">#tape-loops</span>
+        <span class="tag">#looking-for-band</span>
+      </div>
+    </div>
+
+    <div class="card wide">
+      <h2>recent demos</h2>
+      <ul class="setlist">
+        <li><span><span class="track-num">01</span>Low Tide</span><span class="track-meta">3:42 — march 2026</span></li>
+        <li><span><span class="track-num">02</span>Static Bloom</span><span class="track-meta">2:58 — feb 2026</span></li>
+        <li><span><span class="track-num">03</span>Empty Marina</span><span class="track-meta">4:10 — jan 2026</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footnote">— built and booked by joaquin, no algorithm on the bill —</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialHub — choose your starting point</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Anton&family=Fraunces:ital@1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #16151A;
+    --surface: #1E1D22;
+    --surface-2: #26252B;
+    --ink: #ECE9E2;
+    --ink-soft: #9C98A6;
+    --ink-faint: #6b6776;
+    --line: #36343C;
+    --amber: #D9A441;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ===== header ===== */
+  header {
+    border-bottom: 1px solid var(--line);
+    padding: 16px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo { font-weight: 700; font-size: 16px; }
+  .logo .mark { color: var(--ink-faint); }
+  .header-links { display: flex; align-items: center; gap: 24px; }
+  .header-links a {
+    font-size: 13px; color: var(--ink-soft); text-decoration: none;
+    transition: color 0.12s;
+  }
+  .header-links a:hover { color: var(--ink); }
+  .header-links .signin {
+    padding: 8px 16px; border: 1px solid var(--line);
+    border-radius: 8px; color: var(--ink); font-weight: 500;
+  }
+  .header-links .signin:hover { border-color: var(--ink-faint); }
+
+  /* ===== hero ===== */
+  .hero {
+    text-align: center;
+    padding: 72px 40px 52px;
+    max-width: 640px;
+    margin: 0 auto;
+  }
+  .step-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--amber);
+    margin-bottom: 18px;
+    display: block;
+  }
+  .hero h1 {
+    font-size: 38px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 14px;
+  }
+  .hero p {
+    font-size: 15.5px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+
+  /* ===== template grid ===== */
+  .grid-wrap { padding: 0 40px 80px; max-width: 1020px; margin: 0 auto; }
+  .tgrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  /* ===== template card ===== */
+  .tcard {
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--surface);
+    cursor: pointer;
+    transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .tcard:hover {
+    border-color: rgba(255,255,255,0.18);
+    transform: translateY(-3px);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.45);
+  }
+  .tcard.selected {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 2px var(--amber);
+  }
+
+  /* mini preview area */
+  .tcard-preview {
+    height: 180px;
+    position: relative;
+    overflow: hidden;
+    padding: 16px;
+  }
+
+  /* card body */
+  .tcard-body { padding: 16px 18px 20px; }
+  .tcard-name { font-weight: 700; font-size: 16px; margin-bottom: 3px; }
+  .tcard-persona {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+    text-transform: lowercase;
+  }
+  .tcard-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin-bottom: 16px; }
+  .tcard-btn {
+    display: inline-block;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.12s;
+    width: 100%;
+    text-align: center;
+  }
+  .tcard:hover .tcard-btn { border-color: var(--ink-faint); }
+  .tcard.selected .tcard-btn {
+    background: var(--amber);
+    color: #1a1408;
+    border-color: var(--amber);
+  }
+
+  /* ===== PREVIEW STYLES — one per template ===== */
+
+  /* 1 — Builder */
+  .preview-builder { background: #16151A; }
+  .pv-b-avatar {
+    width: 36px; height: 36px; border-radius: 8px;
+    background: linear-gradient(135deg, #FF6B35, #C84A1A);
+    position: absolute; top: 20px; left: 20px;
+  }
+  .pv-b-nameline {
+    position: absolute; top: 24px; left: 64px; right: 20px;
+    height: 10px; background: rgba(236,233,226,0.75); border-radius: 4px;
+  }
+  .pv-b-tagline {
+    position: absolute; top: 40px; left: 64px; width: 60%;
+    height: 7px; background: rgba(236,233,226,0.25); border-radius: 4px;
+  }
+  .pv-b-block {
+    position: absolute;
+    border-radius: 8px;
+    background: rgba(30,29,34,0.75);
+    border: 1px solid #36343C;
+    backdrop-filter: blur(4px);
+  }
+  .pv-b-block.b1 { left: 20px; top: 72px; right: 20px; height: 30px; }
+  .pv-b-block.b2 { left: 20px; top: 108px; right: 70px; height: 24px; }
+  .pv-b-block.b3 { right: 20px; top: 108px; width: 44px; height: 24px; background: rgba(255,107,53,0.22); border-color: rgba(255,107,53,0.35); }
+  .pv-b-dot1 { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #FF6B35; top: 85px; left: 30px; }
+  .pv-b-dot2 { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #4ECDC4; top: 85px; left: 43px; }
+
+  /* 2 — Minimalist */
+  .preview-minimal { background: #F7F6F2; }
+  .pv-m-line {
+    position: absolute; left: 24px; right: 24px;
+    background: #2A2622; border-radius: 3px;
+  }
+  .pv-m-line.title { height: 14px; top: 24px; right: 50%; }
+  .pv-m-line.sub   { height: 7px; top: 46px; right: 35%; opacity: 0.4; }
+  .pv-m-line.l1    { height: 6px; top: 76px; opacity: 0.2; }
+  .pv-m-line.l2    { height: 6px; top: 88px; right: 40%; opacity: 0.2; }
+  .pv-m-line.l3    { height: 6px; top: 100px; right: 60%; opacity: 0.2; }
+  .pv-m-div { position: absolute; left: 24px; right: 24px; top: 64px; height: 1px; background: #2A2622; opacity: 0.15; }
+  .pv-m-tag {
+    position: absolute; height: 18px; border-radius: 4px;
+    border: 1px solid rgba(42,38,34,0.25); background: transparent;
+  }
+  .pv-m-tag.t1 { left: 24px; top: 122px; width: 54px; }
+  .pv-m-tag.t2 { left: 86px; top: 122px; width: 44px; }
+  .pv-m-tag.t3 { left: 138px; top: 122px; width: 60px; }
+
+  /* 3 — Maximalist */
+  .preview-max { background: #1A0F2E; }
+  .pv-x-block {
+    position: absolute; border-radius: 6px;
+  }
+  .pv-x-block.x1 { background: #FF2E88; left: 14px; top: 14px; width: 70px; height: 22px; }
+  .pv-x-block.x2 { background: #FFE94A; right: 14px; top: 24px; width: 52px; height: 52px; border-radius: 4px; transform: rotate(3deg); }
+  .pv-x-block.x3 { background: #4C5BFF; left: 24px; top: 52px; width: 88px; height: 32px; }
+  .pv-x-block.x4 { background: rgba(255,46,136,0.2); left: 14px; top: 98px; right: 14px; height: 18px; border: 1px solid #FF2E88; }
+  .pv-x-block.x5 { background: #4C5BFF; opacity: 0.3; right: 24px; top: 90px; width: 36px; height: 36px; border-radius: 50%; }
+  .pv-x-txt { position: absolute; font-family: 'Anton', sans-serif; color: #FFE94A; font-size: 28px; left: 20px; top: 125px; letter-spacing: 1px; opacity: 0.9; }
+
+  /* 4 — Academic */
+  .preview-academic { background: #EFE9DC; }
+  .pv-a-header { position: absolute; top: 18px; left: 20px; right: 20px; }
+  .pv-a-hline {
+    height: 9px; border-radius: 3px; background: #2A2622; margin-bottom: 5px;
+  }
+  .pv-a-hline.title { width: 55%; }
+  .pv-a-hline.sub   { width: 35%; background: rgba(42,38,34,0.35); height: 6px; }
+  .pv-a-div { position: absolute; left: 20px; right: 20px; top: 62px; height: 1px; background: #A6542D; opacity: 0.5; }
+  .pv-a-section { position: absolute; left: 20px; top: 72px; right: 20px; }
+  .pv-a-num { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #A6542D; position: absolute; left: 0; }
+  .pv-a-sline { height: 6px; border-radius: 3px; background: rgba(42,38,34,0.2); }
+  .pv-a-sline.s1 { position: absolute; left: 16px; top: 0; right: 0; }
+  .pv-a-sline.s2 { position: absolute; left: 16px; top: 10px; right: 30%; }
+  .pv-a-sline.s3 { position: absolute; left: 16px; top: 20px; right: 0; }
+  .pv-a-sline.s4 { position: absolute; left: 16px; top: 30px; right: 50%; }
+  .pv-a-tag {
+    position: absolute; bottom: 16px; height: 15px; border-radius: 3px;
+    background: rgba(166,84,45,0.18); border: 1px solid rgba(166,84,45,0.4);
+  }
+  .pv-a-tag.t1 { left: 20px; width: 48px; }
+  .pv-a-tag.t2 { left: 76px; width: 60px; }
+
+  /* 5 — Musician */
+  .preview-musician { background: #110D1A; }
+  .pv-mu-title {
+    position: absolute; top: 16px; left: 16px; right: 16px;
+    font-family: 'Anton', sans-serif; font-size: 30px;
+    color: #E8336B; line-height: 1; letter-spacing: 0.5px;
+  }
+  .pv-mu-gold { position: absolute; top: 74px; left: 16px; right: 16px; height: 2px; background: #E8B339; }
+  .pv-mu-line {
+    position: absolute; left: 16px; right: 16px;
+    height: 7px; border-radius: 3px; background: rgba(236,233,226,0.15);
+  }
+  .pv-mu-line.l1 { top: 84px; right: 30%; }
+  .pv-mu-line.l2 { top: 97px; right: 50%; }
+  .pv-mu-block {
+    position: absolute; border-radius: 4px;
+    background: rgba(232,179,57,0.15); border: 1px solid rgba(232,179,57,0.35);
+    height: 22px;
+  }
+  .pv-mu-block.mb1 { left: 16px; bottom: 16px; width: 60px; }
+  .pv-mu-block.mb2 { left: 84px; bottom: 16px; width: 44px; }
+  .pv-mu-block.mb3 { left: 136px; bottom: 16px; width: 52px; }
+
+  /* 6 — Cottagecore */
+  .preview-cottage { background: #F0EDE5; }
+  .pv-c-pill {
+    position: absolute; border-radius: 99px;
+    background: rgba(122,139,111,0.18); border: 1px solid rgba(122,139,111,0.4);
+  }
+  .pv-c-pill.p1 { top: 16px; left: 20px; width: 56px; height: 20px; }
+  .pv-c-pill.p2 { top: 16px; left: 84px; width: 72px; height: 20px; }
+  .pv-c-pill.p3 { top: 16px; left: 164px; width: 48px; height: 20px; }
+  .pv-c-line {
+    position: absolute; left: 20px; right: 20px; height: 7px; border-radius: 4px;
+    background: rgba(42,38,34,0.18);
+  }
+  .pv-c-line.l1 { top: 50px; }
+  .pv-c-line.l2 { top: 62px; right: 40%; }
+  .pv-c-line.l3 { top: 82px; }
+  .pv-c-line.l4 { top: 94px; right: 60%; }
+  .pv-c-block {
+    position: absolute; border-radius: 10px;
+    background: rgba(201,139,122,0.15); border: 1px solid rgba(201,139,122,0.35);
+  }
+  .pv-c-block.cb1 { left: 20px; bottom: 16px; right: 20px; height: 28px; }
+  .pv-c-dot { position: absolute; border-radius: 50%; }
+  .pv-c-dot.d1 { width: 28px; height: 28px; background: rgba(122,139,111,0.35); top: 110px; right: 40px; }
+  .pv-c-dot.d2 { width: 18px; height: 18px; background: rgba(201,139,122,0.4); top: 118px; right: 32px; }
+
+  /* ===== bottom note ===== */
+  .note {
+    text-align: center;
+    padding: 0 40px 60px;
+    font-size: 13px;
+    color: var(--ink-faint);
+  }
+  .note a { color: var(--ink-soft); text-decoration: none; }
+  .note a:hover { color: var(--ink); }
+
+  @media (max-width: 740px) {
+    .tgrid { grid-template-columns: repeat(2, 1fr); }
+    .hero h1 { font-size: 28px; }
+    header { padding: 14px 20px; }
+    .grid-wrap { padding: 0 20px 60px; }
+  }
+  @media (max-width: 480px) {
+    .tgrid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><span class="mark">/</span>socialhub</div>
+  <div class="header-links">
+    <a href="browse-mockup.html">browse profiles</a>
+    <a href="signin.html" class="signin">sign in</a>
+  </div>
+</header>
+
+<div class="hero">
+  <span class="step-label">step 1 of 2 — choose your vibe</span>
+  <h1>Your profile starts here.</h1>
+  <p>Pick a template that feels like you. Everything — colors, fonts, blocks, layout — can be changed after. This is just a starting point, not a box.</p>
+</div>
+
+<div class="grid-wrap">
+  <div class="tgrid">
+
+    <!-- 1. Builder -->
+    <a class="tcard" href="editor-mockup.html?template=builder" data-template="builder">
+      <div class="tcard-preview preview-builder">
+        <div class="pv-b-avatar"></div>
+        <div class="pv-b-nameline"></div>
+        <div class="pv-b-tagline"></div>
+        <div class="pv-b-block b1"></div>
+        <div class="pv-b-dot1"></div>
+        <div class="pv-b-dot2"></div>
+        <div class="pv-b-block b2"></div>
+        <div class="pv-b-block b3"></div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Builder</div>
+        <div class="tcard-persona">@forgewright · works with their hands and their head</div>
+        <div class="tcard-desc">Dark canvas. Bold color accents. Good for makers, modders, and people who ship things.</div>
+        <button class="tcard-btn">Start with Builder &rarr;</button>
+      </div>
+    </a>
+
+    <!-- 2. Minimalist -->
+    <a class="tcard" href="editor-mockup.html?template=minimalist" data-template="minimalist">
+      <div class="tcard-preview preview-minimal">
+        <div class="pv-m-line title"></div>
+        <div class="pv-m-line sub"></div>
+        <div class="pv-m-div"></div>
+        <div class="pv-m-line l1"></div>
+        <div class="pv-m-line l2"></div>
+        <div class="pv-m-line l3"></div>
+        <div class="pv-m-tag t1"></div>
+        <div class="pv-m-tag t2"></div>
+        <div class="pv-m-tag t3"></div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Minimalist</div>
+        <div class="tcard-persona">@wren · one thought at a time</div>
+        <div class="tcard-desc">Cream paper. Clean type. For people who want their words to breathe.</div>
+        <button class="tcard-btn">Start with Minimalist &rarr;</button>
+      </div>
+    </a>
+
+    <!-- 3. Maximalist -->
+    <a class="tcard" href="editor-mockup.html?template=maximalist" data-template="maximalist">
+      <div class="tcard-preview preview-max">
+        <div class="pv-x-block x1"></div>
+        <div class="pv-x-block x2"></div>
+        <div class="pv-x-block x3"></div>
+        <div class="pv-x-block x4"></div>
+        <div class="pv-x-block x5"></div>
+        <div class="pv-x-txt">LOUD</div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Maximalist</div>
+        <div class="tcard-persona">@mira · yes, it's intentionally like this</div>
+        <div class="tcard-desc">Neon on dark. Multiple colors. Overlapping energy. Inspired by actual MySpace profiles that worked.</div>
+        <button class="tcard-btn">Start with Maximalist &rarr;</button>
+      </div>
+    </a>
+
+    <!-- 4. Academic -->
+    <a class="tcard" href="editor-mockup.html?template=academic" data-template="academic">
+      <div class="tcard-preview preview-academic">
+        <div class="pv-a-header">
+          <div class="pv-a-hline title"></div>
+          <div class="pv-a-hline sub"></div>
+        </div>
+        <div class="pv-a-div"></div>
+        <div class="pv-a-section">
+          <div class="pv-a-num">01</div>
+          <div class="pv-a-sline s1"></div>
+          <div class="pv-a-sline s2"></div>
+          <div class="pv-a-sline s3"></div>
+          <div class="pv-a-sline s4"></div>
+        </div>
+        <div class="pv-a-tag t1"></div>
+        <div class="pv-a-tag t2"></div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Academic</div>
+        <div class="tcard-persona">@desmond · reads footnotes for fun</div>
+        <div class="tcard-desc">Parchment and rust. Numbered sections. Built like a zine you'd find in a university archive.</div>
+        <button class="tcard-btn">Start with Academic &rarr;</button>
+      </div>
+    </a>
+
+    <!-- 5. Musician -->
+    <a class="tcard" href="editor-mockup.html?template=musician" data-template="musician">
+      <div class="tcard-preview preview-musician">
+        <div class="pv-mu-title">GIG<br>POSTER</div>
+        <div class="pv-mu-gold"></div>
+        <div class="pv-mu-line l1"></div>
+        <div class="pv-mu-line l2"></div>
+        <div class="pv-mu-block mb1"></div>
+        <div class="pv-mu-block mb2"></div>
+        <div class="pv-mu-block mb3"></div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Musician</div>
+        <div class="tcard-persona">@joaquin · plays loud, sleeps late</div>
+        <div class="tcard-desc">Near-black with magenta and gold. Feels like a show flyer. Made for artists, musicians, and performers.</div>
+        <button class="tcard-btn">Start with Musician &rarr;</button>
+      </div>
+    </a>
+
+    <!-- 6. Cottagecore -->
+    <a class="tcard" href="editor-mockup.html?template=cottagecore" data-template="cottagecore">
+      <div class="tcard-preview preview-cottage">
+        <div class="pv-c-pill p1"></div>
+        <div class="pv-c-pill p2"></div>
+        <div class="pv-c-pill p3"></div>
+        <div class="pv-c-line l1"></div>
+        <div class="pv-c-line l2"></div>
+        <div class="pv-c-line l3"></div>
+        <div class="pv-c-line l4"></div>
+        <div class="pv-c-dot d1"></div>
+        <div class="pv-c-dot d2"></div>
+        <div class="pv-c-block cb1"></div>
+      </div>
+      <div class="tcard-body">
+        <div class="tcard-name">Cottagecore</div>
+        <div class="tcard-persona">@marisol · has too many plants, unapologetic</div>
+        <div class="tcard-desc">Warm off-white, sage, and rose. Rounded and soft. For people who keep a windowsill garden.</div>
+        <button class="tcard-btn">Start with Cottagecore &rarr;</button>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<div class="note">
+  Not sure yet? <a href="browse-mockup.html">Browse other profiles</a> to see what people do with their space. &nbsp;&mdash;&nbsp; All six templates are completely free.
+</div>
+
+<script>
+  // Highlight the selected card before navigating
+  document.querySelectorAll('.tcard').forEach(card => {
+    card.addEventListener('click', function(e) {
+      document.querySelectorAll('.tcard').forEach(c => c.classList.remove('selected'));
+      this.classList.add('selected');
+      // In a real app: store chosen template, pass to editor
+      // For now, all links go to editor-mockup.html
+    });
+    // Keyboard: allow Enter to follow the link
+    card.addEventListener('keydown', e => { if (e.key === 'Enter') card.click(); });
+  });
+</script>
+
+</body>
+</html>

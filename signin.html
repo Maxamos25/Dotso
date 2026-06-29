@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SocialHub — sign in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #16151A;
+    --surface: #1E1D22;
+    --surface-2: #26252B;
+    --ink: #ECE9E2;
+    --ink-soft: #9C98A6;
+    --ink-faint: #6b6776;
+    --line: #36343C;
+    --amber: #D9A441;
+    --amber-dim: #3a3022;
+    --danger: #D9695C;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{
+    background: var(--bg); color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+
+  /* top logo */
+  .site-logo{
+    font-weight:700; font-size:16px; text-decoration:none; color: var(--ink);
+    display:block; text-align:center; margin-bottom:40px;
+  }
+  .site-logo .mark{ color: var(--ink-faint); }
+
+  /* card */
+  .card{
+    width:100%; max-width:400px;
+    background: var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:32px;
+  }
+  .card-headline{ font-size:22px; font-weight:700; letter-spacing:-0.3px; margin-bottom:6px; }
+  .card-sub{ font-size:14px; color: var(--ink-soft); line-height:1.6; margin-bottom:28px; }
+
+  /* tabs */
+  .tabs{
+    display:flex; border-bottom:1px solid var(--line); margin-bottom:28px;
+  }
+  .tab{
+    flex:1; padding:10px 0; text-align:center; font-size:13.5px; font-weight:500;
+    color: var(--ink-faint); cursor:pointer; border-bottom:2px solid transparent;
+    margin-bottom:-1px; transition: color 0.12s, border-color 0.12s;
+  }
+  .tab.active{ color: var(--ink); border-color: var(--amber); }
+
+  /* form */
+  .form{ display:none; flex-direction:column; gap:16px; }
+  .form.active{ display:flex; }
+
+  .field-group{ display:flex; flex-direction:column; gap:6px; }
+  .field-label{
+    font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase;
+    letter-spacing:0.8px; color: var(--ink-faint);
+  }
+  .field-wrap{ position:relative; }
+  .field-prefix{
+    position:absolute; left:14px; top:50%; transform:translateY(-50%);
+    font-family:'JetBrains Mono',monospace; font-size:14px; color: var(--ink-soft);
+    pointer-events:none;
+  }
+  input[type="text"], input[type="email"], input[type="password"]{
+    width:100%; padding:12px 14px; border-radius:9px;
+    background: var(--surface-2); border:1px solid var(--line);
+    color: var(--ink); font-family:'Inter',sans-serif; font-size:14px;
+    outline:none; transition: border-color 0.12s;
+  }
+  input[type="text"].has-prefix, input[type="email"].has-prefix{
+    padding-left:28px;
+  }
+  input:focus{ border-color: var(--amber); }
+  input::placeholder{ color: var(--ink-faint); }
+
+  .submit-btn{
+    width:100%; padding:13px; border-radius:9px;
+    background: var(--amber); color:#1a1408; border:none;
+    font-family:'Inter',sans-serif; font-size:14px; font-weight:700;
+    cursor:pointer; transition: background 0.12s; margin-top:4px;
+  }
+  .submit-btn:hover{ background:#e6b556; }
+
+  .form-footer{
+    font-size:12.5px; color: var(--ink-faint); text-align:center; margin-top:4px;
+  }
+  .form-footer a{ color: var(--ink-soft); text-decoration:none; }
+  .form-footer a:hover{ color: var(--ink); }
+
+  /* divider */
+  .or-divider{
+    display:flex; align-items:center; gap:12px;
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; color: var(--ink-faint);
+  }
+  .or-divider::before, .or-divider::after{
+    content:''; flex:1; height:1px; background: var(--line);
+  }
+
+  /* below card */
+  .below-card{
+    margin-top:24px; text-align:center;
+    font-size:13px; color: var(--ink-faint); line-height:1.8;
+  }
+  .below-card a{ color: var(--ink-soft); text-decoration:none; }
+  .below-card a:hover{ color: var(--amber); }
+
+  /* handle hint */
+  .handle-hint{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px;
+    color: var(--ink-faint); margin-top:3px;
+  }
+  .auth-error{
+    font-size:12.5px; color: var(--danger); text-align:center;
+    padding:10px; background:rgba(217,105,92,0.1); border-radius:8px;
+    border:1px solid rgba(217,105,92,0.25); display:none;
+  }
+  .auth-error.visible{ display:block; }
+  .submit-btn:disabled{ opacity:0.6; cursor:not-allowed; }
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <a class="site-logo" href="template-select.html"><span class="mark">/</span>socialhub</a>
+
+  <div class="card">
+    <div class="card-headline">Welcome.</div>
+    <div class="card-sub">A profile that's actually yours — no feed, no algorithm, just you.</div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="signin">Sign in</div>
+      <div class="tab" data-tab="signup">Create account</div>
+    </div>
+
+    <!-- SIGN IN FORM -->
+    <form class="form active" id="form-signin" onsubmit="handleSignin(event)">
+      <div class="auth-error"></div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input type="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="submit-btn">Sign in &rarr;</button>
+      <div class="form-footer">
+        <a href="#">Forgot your password?</a>
+      </div>
+    </form>
+
+    <!-- SIGN UP FORM -->
+    <form class="form" id="form-signup" onsubmit="handleSignup(event)">
+      <div class="field-group">
+        <label class="field-label">Your handle</label>
+        <div class="field-wrap">
+          <span class="field-prefix">@</span>
+          <input type="text" class="has-prefix" id="handle-input"
+            placeholder="forgewright" autocomplete="username"
+            pattern="[a-zA-Z0-9_-]+" maxlength="24" required>
+        </div>
+        <div class="handle-hint" id="handle-hint">letters, numbers, - and _ only</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" placeholder="you@example.com" autocomplete="email" required>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Password</label>
+        <input type="password" placeholder="at least 8 characters" autocomplete="new-password" minlength="8" required>
+      </div>
+      <button type="submit" class="submit-btn">Create my profile &rarr;</button>
+      <div class="form-footer">
+        By signing up you agree to keep it human and treat people well.
+      </div>
+    </form>
+  </div>
+
+  <div class="below-card">
+    Not ready to join yet? <a href="browse-mockup.html">Browse profiles without an account &rarr;</a><br>
+    <a href="template-select.html">See the templates first</a>
+  </div>
+
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAj-pIFaW0OuDUfEbaOm_zFhu4fU9kXZbM",
+    authDomain: "dotso-fec33.firebaseapp.com",
+    projectId: "dotso-fec33",
+    storageBucket: "dotso-fec33.firebasestorage.app",
+    messagingSenderId: "202217283559",
+    appId: "1:202217283559:web:8359ebd1844657b720a742"
+  });
+  const auth = firebase.auth();
+  const db   = firebase.firestore();
+
+  // If already logged in, skip to dashboard
+  auth.onAuthStateChanged(user => { if (user) window.location.href = 'dashboard.html'; });
+
+  // Tab switching
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('form-' + tab.dataset.tab).classList.add('active');
+      clearError();
+    });
+  });
+
+  // Handle input live preview
+  const handleInput = document.getElementById('handle-input');
+  const handleHint  = document.getElementById('handle-hint');
+  if (handleInput) {
+    handleInput.addEventListener('input', () => {
+      const val = handleInput.value.trim();
+      handleHint.textContent = val ? '@' + val + ' — this will be your public handle' : 'letters, numbers, - and _ only';
+    });
+  }
+
+  function showError(msg) {
+    let el = document.querySelector('.auth-error');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'auth-error';
+      document.querySelector('.form.active').prepend(el);
+    }
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+  function clearError() { document.querySelectorAll('.auth-error').forEach(e => e.remove()); }
+  function setLoading(form, on) { form.querySelector('.submit-btn').disabled = on; }
+
+  async function handleSignup(e) {
+    e.preventDefault();
+    clearError();
+    const form   = e.target;
+    const handle = document.getElementById('handle-input').value.trim().toLowerCase();
+    const email  = form.querySelector('input[type="email"]').value.trim();
+    const pass   = form.querySelector('input[type="password"]').value;
+    setLoading(form, true);
+    try {
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      const uid  = cred.user.uid;
+      await db.collection('profiles').doc(uid).set({
+        handle, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+      localStorage.setItem('sh_handle', handle);
+      localStorage.setItem('sh_name', handle);
+      window.location.href = 'template-select.html';
+    } catch(err) {
+      setLoading(form, false);
+      showError(friendlyError(err.code));
+    }
+  }
+
+  async function handleSignin(e) {
+    e.preventDefault();
+    clearError();
+    const form  = e.target;
+    const email = form.querySelector('input[type="email"]').value.trim();
+    const pass  = form.querySelector('input[type="password"]').value;
+    setLoading(form, true);
+    try {
+      await auth.signInWithEmailAndPassword(email, pass);
+      window.location.href = 'dashboard.html';
+    } catch(err) {
+      setLoading(form, false);
+      showError(friendlyError(err.code));
+    }
+  }
+
+  function friendlyError(code) {
+    const map = {
+      'auth/user-not-found':       'No account with that email.',
+      'auth/wrong-password':       'Incorrect password.',
+      'auth/email-already-in-use': 'An account with that email already exists.',
+      'auth/invalid-email':        'Please enter a valid email address.',
+      'auth/weak-password':        'Password must be at least 8 characters.',
+      'auth/too-many-requests':    'Too many attempts — try again in a few minutes.',
+      'auth/invalid-credential':   'Email or password is incorrect.',
+    };
+    return map[code] || 'Something went wrong. Please try again.';
+  }
+</script>
+
+</body>
+</html>

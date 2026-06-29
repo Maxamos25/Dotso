@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forge — Mira's profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0F0E13;
+    --pink: #FF2E88;
+    --yellow: #FFE94A;
+    --cobalt: #4C5BFF;
+    --green: #3CFFB0;
+    --ink: #0F0E13;
+    --paper: #FFF8E8;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background: var(--bg);
+    color: var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding: 28px 20px 90px;
+    overflow-x:hidden;
+  }
+  .page{ max-width: 880px; margin:0 auto; position:relative; }
+
+  .topbar{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom: 30px; padding-bottom:14px; border-bottom: 3px solid var(--yellow);
+  }
+  .logo{ font-family:'Archivo Black',sans-serif; font-size:18px; color: var(--paper); }
+  .logo span{ color: var(--pink); }
+  .topnav{ display:flex; gap:18px; font-size:12px; text-transform:uppercase; letter-spacing:1px; }
+  .topnav span.active{ color: var(--yellow); }
+
+  .marquee{
+    background: var(--pink); color: var(--paper);
+    font-family:'Archivo Black',sans-serif; font-size: 13px; letter-spacing:2px;
+    padding: 7px 0; text-align:center; transform: rotate(-1deg);
+    margin-bottom: 26px; border: 3px solid var(--ink);
+  }
+
+  .hero{
+    display:flex; gap:24px; align-items:flex-start; margin-bottom: 30px; flex-wrap:wrap;
+  }
+  .avatar{
+    width:120px; height:120px; background: var(--cobalt); border:4px solid var(--paper);
+    transform: rotate(-3deg);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Archivo Black',sans-serif; font-size:36px; color: var(--paper);
+    flex-shrink:0;
+  }
+  .hero-text{ flex:1; min-width:240px; }
+  .name{
+    font-family:'Archivo Black',sans-serif; font-size: 44px; line-height:0.95;
+    color: var(--yellow); text-shadow: 4px 4px 0 var(--pink);
+    margin-bottom:10px;
+  }
+  .handle{ font-size:14px; color: var(--green); font-weight:700; }
+  .tagline{ font-size:16px; margin-top:12px; max-width:420px; line-height:1.5; font-weight:600; }
+
+  .board{
+    display:grid; grid-template-columns: repeat(2, 1fr); gap: 20px;
+  }
+  .card{
+    background: var(--paper); color: var(--ink); border:4px solid var(--ink);
+    padding: 18px 20px; position:relative;
+  }
+  .card.r1{ transform: rotate(1.5deg); }
+  .card.r2{ transform: rotate(-1.2deg); }
+  .card.r3{ transform: rotate(0.8deg); }
+  .card.full{ grid-column: 1 / -1; }
+  .card h2{
+    font-family:'Archivo Black',sans-serif; font-size:15px; margin-bottom:10px;
+    background: var(--yellow); display:inline-block; padding:2px 8px; transform: rotate(-1deg);
+  }
+  .card p{ font-size:14px; line-height:1.6; font-weight:600; }
+
+  .tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .tag{
+    font-size:12px; font-weight:700; padding:5px 11px; border:3px solid var(--ink);
+    background: var(--green); color: var(--ink); transform: rotate(-1deg);
+    cursor:pointer;
+  }
+  .tag:nth-child(2n){ background: var(--cobalt); color: var(--paper); transform: rotate(1deg); }
+  .tag:nth-child(3n){ background: var(--pink); color: var(--paper); transform: rotate(-0.5deg); }
+  .tag:active{ transform: scale(0.93); }
+
+  .stickers{ position:absolute; font-family:'Archivo Black',sans-serif; font-size:11px; }
+  .sticker-1{ top:-14px; right:-10px; background:var(--cobalt); color:var(--paper); padding:4px 9px; transform: rotate(8deg); border:3px solid var(--ink); }
+
+  .footnote{
+    margin-top: 32px; text-align:center; font-size:11px; letter-spacing:1px;
+    text-transform:uppercase; color: var(--yellow); font-weight:700;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div class="logo">/<span>forge</span></div>
+    <div class="topnav">
+      <span>browse</span>
+      <span class="active">profile</span>
+      <span>messages</span>
+    </div>
+  </div>
+
+  <div class="marquee">★ ONLINE NOW-ISH ★ MESSAGE ME ★ TOP 8 BELOW ★</div>
+
+  <div class="hero">
+    <div class="avatar">M</div>
+    <div class="hero-text">
+      <div class="name">MIRA!!</div>
+      <div class="handle">@glittertrash</div>
+      <div class="tagline">collage artist. thrift goblin. will talk to you about my zine for way too long.</div>
+    </div>
+  </div>
+
+  <div class="board">
+    <div class="card r1" style="position:relative;">
+      <div class="stickers sticker-1">NEW!</div>
+      <h2>about me</h2>
+      <p>making zines since 2019. obsessed with collage, dollar store finds, and decorating literally anything. this profile took me three hours and i regret nothing.</p>
+    </div>
+
+    <div class="card r2">
+      <h2>top interests</h2>
+      <div class="tags">
+        <span class="tag">#collage</span>
+        <span class="tag">#zinemaking</span>
+        <span class="tag">#thrifting</span>
+        <span class="tag">#riot-grrrl</span>
+        <span class="tag">#stickers</span>
+        <span class="tag">#diy</span>
+      </div>
+    </div>
+
+    <div class="card r3 full">
+      <h2>currently obsessed with</h2>
+      <p>making a collage zine about strip mall signage, my new box of expired polaroid film, and finding people who still mail physical letters!! if u send mail i will send mail back, i promise</p>
+    </div>
+  </div>
+
+  <div class="footnote">no algorithm here, mira built this herself, tilted card and all</div>
+
+</div>
+</body>
+</html>
