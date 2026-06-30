@@ -1604,7 +1604,7 @@
     saveProfile();
     const btn = document.getElementById('save-btn');
     btn.textContent = '✓ saved';
-    setTimeout(() => { btn.textContent = 'Save'; }, 1500);
+    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
   }
 
   function publishProfile() {
