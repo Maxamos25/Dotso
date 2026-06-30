@@ -251,6 +251,10 @@
   .link-row-edit{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:14px; }
   .link-row-edit:last-child{ border-bottom:none; }
   .link-row-edit .arrow{ color: var(--ink-faint); flex-shrink:0; margin-left:8px; }
+  .link-row-edit.url-linked .field{ color:var(--amber); text-decoration:underline; text-underline-offset:3px; }
+  .link-row-edit.url-linked .arrow{ color:var(--amber); }
+  body.preview-mode .link-row-edit.url-linked{ cursor:pointer; }
+  body:not(.preview-mode) .link-row-edit.url-linked .field{ cursor:text; }
 
   /* ===== resize handles ===== */
   .resize-handle{ position:absolute; width:12px; height:12px; z-index:30; }
@@ -1205,6 +1209,26 @@
   }
 
   // =====================================================================
+  // =====================================================================
+  // LINK URL HELPERS
+  // =====================================================================
+  function looksLikeUrl(s) {
+    return /^https?:\/\/.+\..+/.test(s) || /^www\..+\..+/.test(s) || /^\S+\.(com|org|net|io|co|dev|app|me|gg|tv|fm|uk|ca|au|de|fr|jp|studio|link|shop|social)(\/\S*)?$/.test(s);
+  }
+  function normalizeUrl(s) {
+    if (/^https?:\/\//.test(s)) return s;
+    return 'https://' + s;
+  }
+  function markLinkRow(row, url) {
+    row.classList.add('url-linked');
+    row.dataset.url = url;
+  }
+  function clearLinkRow(row) {
+    row.classList.remove('url-linked');
+    delete row.dataset.url;
+  }
+
+  // =====================================================================
   // FIELD PLACEHOLDERS
   // =====================================================================
   function wireField(el) {
@@ -1215,6 +1239,24 @@
         else if (el.classList.contains('body-field'))    el.textContent = 'Say something here.';
       }
     });
+    // Auto-hyperlink in link rows on Enter
+    const row = el.closest('.link-row-edit');
+    if (row && el.classList.contains('field')) {
+      el.addEventListener('keydown', e => {
+        if (e.key !== 'Enter') return;
+        e.preventDefault();
+        const text = el.textContent.trim();
+        if (looksLikeUrl(text)) {
+          markLinkRow(row, normalizeUrl(text));
+        } else {
+          clearLinkRow(row);
+        }
+        el.blur();
+      });
+      el.addEventListener('focus', () => {
+        clearLinkRow(row);
+      });
+    }
   }
 
   // =====================================================================
@@ -1662,7 +1704,11 @@
       } else if (type === 'list') {
         entry.items = [...b.querySelectorAll('li')].map(li => li.textContent.trim());
       } else if (type === 'links') {
-        entry.links = [...b.querySelectorAll('.link-row-edit .field')].map(s => s.textContent.trim());
+        entry.links = [...b.querySelectorAll('.link-row-edit')].map(row => {
+          const text = row.querySelector('.field')?.textContent?.trim() || '';
+          const url  = row.dataset.url || '';
+          return url && url !== text ? text + '||' + url : text;
+        });
       }
       saved.push(entry);
     });
@@ -1791,7 +1837,14 @@
         b.innerHTML = `<div class="block-label"></div>
           ${linksHtml}${TOOLBAR}${COLOR_POP}${FONT_POP}${HANDLES}`;
         b.querySelector('.block-label').textContent = d.label || 'links';
-        b.querySelectorAll('.link-row-edit .field').forEach((s, i) => { s.textContent = d.links[i] || ''; });
+        b.querySelectorAll('.link-row-edit').forEach((row, i) => {
+          const raw = d.links[i] || '';
+          const parts = raw.split('||');
+          const text  = parts[0];
+          const url   = parts[1] || (looksLikeUrl(raw) ? normalizeUrl(raw) : '');
+          row.querySelector('.field').textContent = text;
+          if (url) markLinkRow(row, url);
+        });
 
       } else if (d.type === 'custom') {
         b.innerHTML = `<div class="block-label" contenteditable="true" tabindex="0"></div>
@@ -2235,7 +2288,11 @@
     } else if (type === 'list') {
       entry.items = [...block.querySelectorAll('li')].map(li => li.textContent.trim()).filter(Boolean);
     } else if (type === 'links') {
-      entry.links = [...block.querySelectorAll('.link-row-edit .field')].map(s => s.textContent.trim()).filter(Boolean);
+      entry.links = [...block.querySelectorAll('.link-row-edit')].map(row => {
+        const text = row.querySelector('.field')?.textContent?.trim() || '';
+        const url  = row.dataset.url || '';
+        return url && url !== text ? text + '||' + url : text;
+      }).filter(Boolean);
     }
     const saved = JSON.parse(localStorage.getItem('sh_inspiration') || '[]');
     saved.unshift(entry);
@@ -2267,7 +2324,15 @@
     } else if (entry.type === 'list' && entry.items?.length) {
       div.querySelectorAll('li').forEach((li, i) => { if (entry.items[i] !== undefined) li.textContent = entry.items[i]; });
     } else if (entry.type === 'links' && entry.links?.length) {
-      div.querySelectorAll('.link-row-edit .field').forEach((f, i) => { if (entry.links[i] !== undefined) f.textContent = entry.links[i]; });
+      div.querySelectorAll('.link-row-edit').forEach((row, i) => {
+        if (entry.links[i] === undefined) return;
+        const raw = entry.links[i];
+        const parts = raw.split('||');
+        const text = parts[0];
+        const url  = parts[1] || (looksLikeUrl(raw) ? normalizeUrl(raw) : '');
+        row.querySelector('.field').textContent = text;
+        if (url) markLinkRow(row, url);
+      });
     }
     const s = entry.style || {};
     if (s.bg) div.style.background = s.bg;
@@ -2365,6 +2430,14 @@
         if (bot > maxBottom) maxBottom = bot;
       });
       if (maxBottom > 0) panel.style.minHeight = (maxBottom + 80) + 'px';
+
+      // Make hyperlinked link rows actually clickable in preview
+      panel.querySelectorAll('.link-row-edit.url-linked').forEach(row => {
+        const url = row.dataset.url;
+        if (!url) return;
+        row.addEventListener('click', () => window.open(url, '_blank', 'noopener'));
+      });
+
       // Back button
       const backBtn = document.createElement('a');
       backBtn.className = 'preview-back';
