@@ -73,6 +73,36 @@
 
   /* greeting */
   .dash-greeting{ }
+  .handle-row{ display:flex; align-items:center; gap:8px; margin-top:6px; }
+  .handle-display{
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--ink-soft);
+  }
+  .handle-edit-btn{
+    font-family:'JetBrains Mono',monospace; font-size:10px;
+    padding:3px 8px; border-radius:5px;
+    border:1px solid rgba(255,255,255,0.1); background:transparent;
+    color:var(--ink-faint); cursor:pointer; transition:all 0.12s;
+  }
+  .handle-edit-btn:hover{ border-color:rgba(255,255,255,0.25); color:var(--ink); }
+  .handle-edit-row{ display:none; align-items:center; gap:8px; margin-top:6px; }
+  .handle-edit-row.open{ display:flex; }
+  .handle-input{
+    font-family:'JetBrains Mono',monospace; font-size:13px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15);
+    border-radius:7px; padding:6px 10px; color:var(--ink); outline:none; width:160px;
+  }
+  .handle-input:focus{ border-color:var(--amber); }
+  .handle-save-btn{
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    padding:6px 12px; border-radius:7px;
+    border:none; background:var(--amber); color:#1a1408;
+    cursor:pointer; font-weight:600;
+  }
+  .handle-cancel-btn{
+    font-size:12px; padding:6px 10px; border-radius:7px;
+    border:1px solid rgba(255,255,255,0.1); background:transparent;
+    color:var(--ink-faint); cursor:pointer;
+  }
   .dash-date{
     font-family:'JetBrains Mono',monospace; font-size:10.5px;
     text-transform:uppercase; letter-spacing:1.2px;
@@ -244,7 +274,15 @@
       <div class="dash-greeting">
         <div class="dash-date" id="dash-date"></div>
         <div class="dash-name" id="dash-name">Hey.</div>
-        <div class="dash-sub">Your profile is live.</div>
+        <div class="handle-row">
+          <span class="handle-display" id="handle-display"></span>
+          <button class="handle-edit-btn" onclick="openHandleEdit()">✎ change handle</button>
+        </div>
+        <div class="handle-edit-row" id="handle-edit-row">
+          <input class="handle-input" id="handle-input" type="text" maxlength="24" placeholder="yourhandle">
+          <button class="handle-save-btn" onclick="saveHandle()">save</button>
+          <button class="handle-cancel-btn" onclick="closeHandleEdit()">✕</button>
+        </div>
       </div>
 
       <!-- Stats -->
@@ -339,6 +377,7 @@
       localStorage.setItem('sh_handle', h);
       document.querySelectorAll('.nav-handle').forEach(el => el.textContent = '@' + h);
       document.getElementById('dash-name').textContent = 'Hey, ' + h + '.';
+      document.getElementById('handle-display').textContent = '@' + h;
     } catch(e) {
       document.getElementById('dash-name').textContent = 'Hey.';
     }
@@ -347,6 +386,29 @@
   });
 
   function doSignOut() { _auth.signOut().then(() => window.location.href = 'signin.html'); }
+
+  function openHandleEdit() {
+    const cur = localStorage.getItem('sh_handle') || '';
+    document.getElementById('handle-input').value = cur;
+    document.getElementById('handle-edit-row').classList.add('open');
+    document.getElementById('handle-input').focus();
+  }
+  function closeHandleEdit() {
+    document.getElementById('handle-edit-row').classList.remove('open');
+  }
+  async function saveHandle() {
+    const val = document.getElementById('handle-input').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+    if (!val) return;
+    const user = _auth.currentUser;
+    if (user) {
+      await _db.collection('profiles').doc(user.uid).set({ handle: val }, { merge: true }).catch(() => {});
+    }
+    localStorage.setItem('sh_handle', val);
+    document.getElementById('dash-name').textContent = 'Hey, ' + val + '.';
+    document.getElementById('handle-display').textContent = '@' + val;
+    document.querySelectorAll('.nav-handle').forEach(el => el.textContent = '@' + val);
+    closeHandleEdit();
+  }
 
   function dismissOverlay() {
     document.getElementById('dash-overlay').classList.add('dismissed');
