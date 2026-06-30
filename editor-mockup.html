@@ -1000,6 +1000,7 @@
 
   function makeDraggable(block) {
     block.addEventListener('mousedown', e => {
+      if (isPreview) return;
       if (e.target.closest('.resize-handle') ||
           e.target.closest('.tbtn') ||
           e.target.closest('.popover') ||
@@ -1038,6 +1039,7 @@
   function makeResizable(block) {
     block.querySelectorAll('.resize-handle').forEach(handle => {
       handle.addEventListener('mousedown', e => {
+        if (isPreview) return;
         e.preventDefault(); e.stopPropagation();
         bringToFront(block);
         const dir = handle.dataset.dir;
