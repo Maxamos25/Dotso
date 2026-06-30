@@ -205,8 +205,10 @@
   const auth = firebase.auth();
   const db   = firebase.firestore();
 
-  // If already logged in, skip to dashboard
-  auth.onAuthStateChanged(user => { if (user) window.location.href = 'dashboard.html'; });
+  let _signingUp = false;
+
+  // If already logged in, skip to dashboard (but not during signup — signup handles its own redirect)
+  auth.onAuthStateChanged(user => { if (user && !_signingUp) window.location.href = 'dashboard.html'; });
 
   // Tab switching
   document.querySelectorAll('.tab').forEach(tab => {
@@ -245,6 +247,7 @@
   async function handleSignup(e) {
     e.preventDefault();
     clearError();
+    _signingUp = true;
     const form   = e.target;
     const handle = document.getElementById('handle-input').value.trim();
     const email  = form.querySelector('input[type="email"]').value.trim();
