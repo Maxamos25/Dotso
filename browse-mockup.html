@@ -3,244 +3,143 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SocialHub — browse</title>
+<title>Dotso — browse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 <style>
   :root{
-    --bg: #16151A;
-    --surface: #1F1E24;
-    --surface-2: #26252C;
-    --ink: #ECE9E2;
-    --ink-soft: #9C98A6;
-    --ink-faint: #6b6776;
-    --line: #34323a;
-    --accent: #E8E4D8;
-    --amber: #D9A441;
+    --bg:#16151A; --surface:#1F1E24; --surface-2:#26252C;
+    --ink:#ECE9E2; --ink-soft:#9C98A6; --ink-faint:#6b6776;
+    --line:#34323a; --amber:#D9A441;
   }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{
-    background: var(--bg);
-    color: var(--ink);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    padding: 36px 24px 100px;
-  }
-  .page{ max-width: 980px; margin:0 auto; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Inter',sans-serif; min-height:100vh; padding:36px 24px 100px; }
+  .page{ max-width:980px; margin:0 auto; }
 
-  .topbar{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom: 32px; padding-bottom:16px; border-bottom:1px solid var(--line);
-  }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; padding-bottom:16px; border-bottom:1px solid var(--line); }
   .logo{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:18px; }
-  .logo .mark{ color: var(--ink-soft); }
-  .topnav{ display:flex; gap:22px; font-size:13px; color: var(--amber); font-family:'JetBrains Mono',monospace; }
-  .topnav a{ color: var(--amber); text-decoration:none; opacity:0.6; }
+  .logo .mark{ color:var(--ink-soft); }
+  .topnav{ display:flex; gap:22px; font-size:13px; font-family:'JetBrains Mono',monospace; }
+  .topnav a{ color:var(--amber); text-decoration:none; opacity:0.6; }
   .topnav a:hover{ opacity:1; }
-  .topnav span.active{ opacity:1; }
+  .topnav span.active{ color:var(--amber); opacity:1; }
 
-  .search-block{ margin-bottom: 28px; }
-  .search-row{
-    display:flex; gap:10px; margin-bottom:18px;
-  }
+  .search-block{ margin-bottom:28px; }
+  .search-row{ display:flex; gap:10px; margin-bottom:14px; }
   .search-input{
-    flex:1; background: var(--surface); border:1px solid var(--line); border-radius:10px;
-    padding: 13px 16px; color: var(--ink); font-size:14px; font-family:'Inter',sans-serif;
+    flex:1; background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:13px 16px; color:var(--ink); font-size:14px; font-family:'Inter',sans-serif; outline:none;
+    transition:border-color 0.12s;
   }
-  .search-input::placeholder{ color: var(--ink-faint); }
+  .search-input:focus{ border-color:var(--amber); }
+  .search-input::placeholder{ color:var(--ink-faint); }
 
-  .active-tag-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-  .active-label{ font-family:'JetBrains Mono',monospace; font-size:12px; color: var(--ink-faint); }
+  .active-tag-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-height:28px; }
+  .active-label{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-faint); }
   .active-tag{
-    font-family:'JetBrains Mono',monospace; font-size:13px; padding:6px 12px;
-    background: var(--surface-2); border:1px solid var(--amber); border-radius:7px;
-    display:inline-flex; align-items:center; gap:8px; color: var(--ink);
+    font-family:'JetBrains Mono',monospace; font-size:12px; padding:4px 10px;
+    background:var(--surface-2); border:1px solid var(--amber); border-radius:7px;
+    display:inline-flex; align-items:center; gap:6px; color:var(--ink); cursor:pointer;
   }
-  .active-tag .x{ color: var(--ink-faint); cursor:pointer; }
+  .active-tag .x{ color:var(--ink-faint); }
+  .active-tag:hover .x{ color:var(--ink); }
 
-  .related-tags{ display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
-  .related-tag{
-    font-family:'JetBrains Mono',monospace; font-size:12px; padding:5px 11px;
-    color: var(--ink-soft); border:1px solid var(--line); border-radius:7px; cursor:pointer;
-  }
-  .related-tag:hover{ color: var(--ink); border-color: var(--ink-faint); }
-
-  .meta-row{
-    display:flex; justify-content:space-between; align-items:baseline;
-    margin: 30px 0 18px; font-size:13px; color: var(--ink-faint);
-  }
+  .meta-row{ display:flex; justify-content:space-between; align-items:baseline; margin:24px 0 16px; font-size:13px; color:var(--ink-faint); }
   .result-count{ font-family:'JetBrains Mono',monospace; }
   .sort-controls{ display:flex; align-items:center; gap:8px; }
-  .sort-label{ font-family:'JetBrains Mono',monospace; font-size:11px; color: var(--ink-faint); }
+  .sort-label{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint); }
   .sort-btn{
     font-family:'JetBrains Mono',monospace; font-size:11.5px; padding:5px 12px;
     border-radius:99px; border:1px solid var(--line); background:transparent;
-    color: var(--ink-soft); cursor:pointer; transition: all 0.12s;
+    color:var(--ink-soft); cursor:pointer; transition:all 0.12s;
   }
-  .sort-btn:hover{ border-color: var(--ink-faint); color: var(--ink); }
-  .sort-btn.active{ background: var(--surface-2); border-color: var(--amber); color: var(--ink); }
-  .online-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:#4ECDC4; margin-right:5px; vertical-align:middle; }
+  .sort-btn:hover{ border-color:var(--ink-faint); color:var(--ink); }
+  .sort-btn.active{ background:var(--surface-2); border-color:var(--amber); color:var(--ink); }
+  .online-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:#4ECDC4; margin-right:4px; vertical-align:middle; }
 
-  .grid{
-    display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
-  }
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+  @media(max-width:680px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+  @media(max-width:440px){ .grid{ grid-template-columns:1fr; } }
 
   .pcard{
-    background: var(--surface); border:1px solid var(--line); border-radius: 14px;
-    overflow:hidden; cursor:pointer; transition: border-color 0.15s ease;
-    display:flex; flex-direction:column;
+    background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; transition:border-color 0.15s; display:flex; flex-direction:column;
   }
-  .pcard:hover{ border-color: var(--ink-faint); }
+  .pcard:hover{ border-color:var(--ink-faint); }
+  .pcard .strip{ height:48px; position:relative; }
+  .pcard .body{ padding:14px 16px 16px; flex:1; display:flex; flex-direction:column; gap:6px; }
+  .pcard .pname{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:15px; }
+  .pcard .phandle{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint); }
+  .pcard .pline{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; flex:1; }
+  .pcard .ptags{ display:flex; flex-wrap:wrap; gap:5px; margin-top:4px; }
+  .pcard .ptag{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:3px 7px;
+    border-radius:5px; background:rgba(255,255,255,0.06); color:var(--ink-soft);
+  }
+  .pcard .ptag.match{ background:rgba(217,164,65,0.15); color:var(--amber); }
+  .pcard .card-footer{ display:flex; align-items:center; justify-content:space-between; padding:10px 16px 14px; }
+  .follow-btn{
+    font-family:'JetBrains Mono',monospace; font-size:10.5px; padding:5px 12px;
+    border-radius:7px; border:1px solid var(--line); background:transparent;
+    color:var(--ink-soft); cursor:pointer; transition:all 0.12s;
+  }
+  .follow-btn:hover{ border-color:var(--amber); color:var(--amber); }
+  .follow-btn.following{ border-color:rgba(255,255,255,0.1); color:var(--ink-faint); }
+  .follow-btn.following:hover{ border-color:rgba(220,60,60,0.4); color:#e05c5c; }
+  .online-badge{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:#4ECDC4;
+    display:flex; align-items:center; gap:4px;
+  }
 
-  .pcard .strip{ height: 54px; display:flex; align-items:flex-end; padding: 0 16px 10px; position:relative; }
-  .pcard .strip .swatches{ display:flex; gap:5px; position:absolute; top:12px; left:16px; }
-  .pcard .swatch{ width:9px; height:9px; border-radius:2px; }
+  /* palette strip colors */
+  .strip-0{ background:linear-gradient(135deg,#221f28,#1c1a1f); }
+  .strip-1{ background:linear-gradient(135deg,#efeae0,#e6e0d2); }
+  .strip-2{ background:linear-gradient(135deg,#1A0F2E,#251640); }
+  .strip-3{ background:linear-gradient(135deg,#1A0F2E,#FF2E88 200%); }
+  .strip-4{ background:linear-gradient(135deg,#F7F6F2,#e6e0d2); }
+  .strip-5{ background:linear-gradient(135deg,#EFE9DC,#e3d9c2); }
 
-  .pcard .body{ padding: 14px 16px 16px; flex:1; display:flex; flex-direction:column; }
-  .pcard .pname{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px; margin-bottom:3px; }
-  .pcard .phandle{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color: var(--ink-faint); margin-bottom:10px; }
-  .pcard .pline{ font-size:13px; color: var(--ink-soft); line-height:1.5; margin-bottom:12px; flex:1; }
-  .pcard .ptags{ display:flex; flex-wrap:wrap; gap:6px; }
-  .pcard .ptag{ font-family:'JetBrains Mono',monospace; font-size:11px; padding:3px 8px; border-radius:5px; }
-  .pcard .ptag.match{ font-weight:500; }
-
-  /* per-card palette echoes (preview only, not full theme) */
-  .strip.builder{ background: linear-gradient(135deg,#221f28,#1c1a1f); }
-  .strip.builder .swatch:nth-child(1){ background:#FF6B35; } .strip.builder .swatch:nth-child(2){ background:#4ECDC4; }
-  .ptag.builder-a{ background:#1c3433; color:#4ECDC4; } .ptag.builder-b{ background:#4a2c1c; color:#FF6B35; }
-
-  .strip.minimal{ background: linear-gradient(135deg,#efeae0,#e6e0d2); }
-  .strip.minimal .swatch:nth-child(1){ background:#7A8B6F; } .strip.minimal .swatch:nth-child(2){ background:#1C1B19; }
-  .ptag.minimal-a{ background:#e9e4d6; color:#5b6b50; }
-
-  .strip.maxi{ background: linear-gradient(135deg,#FF2E88,#4C5BFF); }
-  .strip.maxi .swatch:nth-child(1){ background:#FFE94A; } .strip.maxi .swatch:nth-child(2){ background:#3CFFB0; }
-  .ptag.maxi-a{ background:#3a2740; color:#ff7fb0; } .ptag.maxi-b{ background:#1f2a4a; color:#8a96ff; }
-
-  .strip.acad{ background: linear-gradient(135deg,#EFE9DC,#e3d9c2); }
-  .strip.acad .swatch:nth-child(1){ background:#A6542D; } .strip.acad .swatch:nth-child(2){ background:#2A2622; }
-  .ptag.acad-a{ background:#e6dcc8; color:#7a4424; }
-
-  .strip.music{ background: linear-gradient(135deg,#1A0F2E,#251640); }
-  .strip.music .swatch:nth-child(1){ background:#E8336B; } .strip.music .swatch:nth-child(2){ background:#E8B339; }
-  .ptag.music-a{ background:#3d2454; color:#f06a93; } .ptag.music-b{ background:#3d3220; color:#e8b339; }
-
-  .strip.cottage{ background: linear-gradient(135deg,#F6F1E4,#ece4cc); }
-  .strip.cottage .swatch:nth-child(1){ background:#8A9A6E; } .strip.cottage .swatch:nth-child(2){ background:#C98B7A; }
-  .ptag.cottage-a{ background:#e3ddc4; color:#5c6e44; } .ptag.cottage-b{ background:#ecdcd3; color:#9c5a48; }
+  .empty-state{
+    grid-column:1/-1; text-align:center; padding:60px 20px;
+    color:var(--ink-faint); font-size:14px; line-height:1.8;
+  }
+  .loading-state{
+    grid-column:1/-1; text-align:center; padding:60px 20px;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--ink-faint);
+  }
 
   .footnote{
-    margin-top: 44px; text-align:center; font-family:'JetBrains Mono',monospace;
-    font-size:11.5px; color: var(--ink-faint); line-height:1.8; max-width:480px; margin-left:auto; margin-right:auto;
-  }
-
-  /* ===== floating palette + bg controls ===== */
-  .float-controls{
-    position: fixed; top: 68px; right: 24px; z-index: 95;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .bg-btn{
-    width:30px; height:30px; border-radius:8px;
-    background: var(--surface-2); border:1px solid var(--line);
-    color: var(--ink-soft); cursor:pointer; font-size:13px;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-  .bg-btn:hover{ border-color: var(--ink-faint); color: var(--ink); }
-  .palette-pill{
-    display:flex; align-items:stretch;
-    background: var(--surface-2); border:1px solid var(--line); border-radius:99px;
-    overflow:hidden; height:30px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-  .pp-arrow{
-    width:28px; background:transparent; border:none;
-    color: var(--ink-soft); cursor:pointer; font-size:15px;
-    display:flex; align-items:center; justify-content:center; flex-shrink:0;
-  }
-  .pp-arrow:hover{ background:rgba(255,255,255,0.05); color: var(--ink); }
-  .pp-center{
-    display:flex; align-items:center; gap:8px; padding:0 10px;
-    border-left:1px solid var(--line); border-right:1px solid var(--line);
-  }
-  .ps-swatches{ display:flex; gap:3px; }
-  .ps-swatches span{ width:10px; height:10px; border-radius:3px; flex-shrink:0; }
-  .ps-name{ font-size:12px; font-weight:600; white-space:nowrap; color: var(--ink); }
-  .bg-popover{
-    position:absolute; top:calc(100% + 8px); left:0; z-index:60;
-    background: var(--surface-2); border:1px solid var(--line); border-radius:10px;
-    padding:14px; width:206px; display:none; box-shadow: 0 8px 24px rgba(0,0,0,0.45);
-  }
-  .bg-popover.open{ display:block; }
-  .popover-title{
-    font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase;
-    letter-spacing:0.5px; color: var(--ink-faint); margin-bottom:10px;
-  }
-  .swatch-row{ display:flex; gap:7px; flex-wrap:wrap; margin-bottom:4px; }
-  .pop-swatch{
-    width:24px; height:24px; border-radius:6px; cursor:pointer; border:2px solid transparent;
-  }
-  .pop-swatch.selected{ border-color: var(--accent); }
-  .pop-swatch.reset{
-    background: var(--surface); display:flex; align-items:center; justify-content:center;
-    color: var(--ink-faint); font-size:11px; border:1px dashed var(--line);
+    margin-top:44px; text-align:center; font-family:'JetBrains Mono',monospace;
+    font-size:11.5px; color:var(--ink-faint); line-height:1.8;
   }
 </style>
 </head>
 <body>
-
-  <!-- Floating palette + bg controls -->
-  <div class="float-controls" id="float-controls">
-    <div class="bg-btn" id="bg-toggle" title="page background">&#9632;</div>
-    <div class="bg-popover" id="bg-popover">
-      <div class="popover-title">page background</div>
-      <div class="swatch-row">
-        <div class="pop-swatch" style="background:#16151A;" data-bg="#16151A"></div>
-        <div class="pop-swatch" style="background:#F7F6F2;" data-bg="#F7F6F2"></div>
-        <div class="pop-swatch" style="background:#1A0F2E;" data-bg="#1A0F2E"></div>
-        <div class="pop-swatch" style="background:#F6F1E4;" data-bg="#F6F1E4"></div>
-        <div class="pop-swatch" style="background:#EFE9DC;" data-bg="#EFE9DC"></div>
-        <div class="pop-swatch reset" id="bg-upload-pop" title="upload image">&#128247;</div>
-      </div>
-    </div>
-    <div class="palette-pill">
-      <button class="pp-arrow" id="ps-prev">&#8249;</button>
-      <div class="pp-center" id="ps-current">
-        <div class="ps-swatches"><span></span><span></span><span></span></div>
-        <span class="ps-name"></span>
-      </div>
-      <button class="pp-arrow" id="ps-next">&#8250;</button>
-    </div>
-  </div>
-
 <div class="page">
 
   <div class="topbar">
-    <div class="logo"><span class="mark">/</span>socialhub</div>
+    <div class="logo"><span class="mark">/</span>dotso</div>
     <div class="topnav">
       <span class="active">browse</span>
       <a href="dashboard.html">dashboard</a>
       <a href="messages.html">messages</a>
-      <a href="signin.html">sign in</a>
     </div>
   </div>
 
   <div class="search-block">
     <div class="search-row">
-      <input class="search-input" type="text" placeholder="search by tag, name, or interest..." value="">
+      <input class="search-input" id="search-input" type="text" placeholder="search by tag or name...">
     </div>
-    <div class="active-tag-row">
-      <span class="active-label">browsing:</span>
-      <span class="active-tag">#game-dev <span class="x">×</span></span>
-      <span class="related-tag">#3d-modeling</span>
-      <span class="related-tag">#indie-dev</span>
-      <span class="related-tag">#character-design</span>
-      <span class="related-tag">#electron</span>
+    <div class="active-tag-row" id="active-tags">
+      <span class="active-label" id="browse-label" style="display:none;">filtering:</span>
     </div>
   </div>
 
   <div class="meta-row">
-    <span class="result-count">[ 47 profiles tagged #game-dev ]</span>
+    <span class="result-count" id="result-count">loading...</span>
     <div class="sort-controls">
       <span class="sort-label">sort by:</span>
       <button class="sort-btn active" data-sort="random">random</button>
@@ -249,168 +148,253 @@
     </div>
   </div>
 
-  <div class="grid">
-
-    <div class="pcard" data-who="forgewright">
-      <div class="strip builder"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Bud R.</div>
-        <div class="phandle">@forgewright</div>
-        <div class="pline">Building custom characters for games that weren't built for them. Skyrim modder.</div>
-        <div class="ptags">
-          <span class="ptag builder-a match">#game-dev</span>
-          <span class="ptag builder-b">#skyrim-modding</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="pcard" data-who="mira">
-      <div class="strip maxi"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Mira</div>
-        <div class="phandle">@glittertrash</div>
-        <div class="pline">Collage artist making a small narrative mini-game about strip mall signage.</div>
-        <div class="ptags">
-          <span class="ptag maxi-a match">#game-dev</span>
-          <span class="ptag maxi-b">#diy</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="pcard" data-who="joaquin">
-      <div class="strip music"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Joaquin</div>
-        <div class="phandle">@lowendjoaquin</div>
-        <div class="pline">Bedroom producer scoring a friend's indie game. Looking to learn the pipeline.</div>
-        <div class="ptags">
-          <span class="ptag music-a match">#game-dev</span>
-          <span class="ptag music-b">#home-recording</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="pcard" data-who="marisol">
-      <div class="strip cottage"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Marisol</div>
-        <div class="phandle">@windowsillwitch</div>
-        <div class="pline">Bookkeeper by day, learning Godot at night to make a tiny plant-care game.</div>
-        <div class="ptags">
-          <span class="ptag cottage-a match">#game-dev</span>
-          <span class="ptag cottage-b">#houseplants</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="pcard" data-who="desmond">
-      <div class="strip acad"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Desmond Okafor</div>
-        <div class="phandle">@d.okafor</div>
-        <div class="pline">Researching whether a text-based history game could teach archive literacy.</div>
-        <div class="ptags">
-          <span class="ptag acad-a match">#game-dev</span>
-          <span class="ptag acad-a">#archives</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="pcard" data-who="marisol">
-      <div class="strip minimal"><div class="swatches"><span class="swatch"></span><span class="swatch"></span></div></div>
-      <div class="body">
-        <div class="pname">Wren Halloway</div>
-        <div class="phandle">@wrenh</div>
-        <div class="pline">Translator helping localize a small Japanese indie title into English.</div>
-        <div class="ptags">
-          <span class="ptag minimal-a match">#game-dev</span>
-          <span class="ptag minimal-a">#translation</span>
-        </div>
-      </div>
-    </div>
-
+  <div class="grid" id="profile-grid">
+    <div class="loading-state">loading profiles...</div>
   </div>
 
-  <div class="footnote">this list is not ranked, recommended, or sorted by popularity &mdash; just people who share your interests</div>
-
+  <div class="footnote">this list is not ranked or sorted by popularity — just people on dotso</div>
 </div>
-<script>
-  const PALETTES = [
-    { name:'Forge',      accent:'#D9A441', accentDim:'#3a3022', swatches:['#FF6B35','#4ECDC4','#2B2730'] },
-    { name:'Windowsill', accent:'#7A8B6F', accentDim:'#2e3a28', swatches:['#7A8B6F','#C98B7A','#FBF8EF'] },
-    { name:'Gig Poster', accent:'#E8336B', accentDim:'#4a1f33', swatches:['#E8336B','#E8B339','#251640'] },
-    { name:'Scrapbook',  accent:'#FF2E88', accentDim:'#4a1f38', swatches:['#FF2E88','#FFE94A','#4C5BFF'] },
-    { name:'Quiet',      accent:'#9C98A6', accentDim:'#36343C', swatches:['#9C98A6','#1C1B19','#F7F6F2'] },
-    { name:'Archive',    accent:'#A6542D', accentDim:'#4a2c1c', swatches:['#A6542D','#2A2622','#EFE9DC'] },
-  ];
-  let paletteIdx = parseInt(localStorage.getItem('sh_palette') || '0');
-  function renderPalette() {
-    const p = PALETTES[paletteIdx];
-    document.getElementById('ps-current').querySelector('.ps-name').textContent = p.name;
-    const sw = document.getElementById('ps-current').querySelectorAll('.ps-swatches span');
-    p.swatches.forEach((c, i) => { if (sw[i]) sw[i].style.background = c; });
-    document.documentElement.style.setProperty('--accent', p.accent);
-    document.documentElement.style.setProperty('--amber', p.accent);
-    localStorage.setItem('sh_palette', paletteIdx);
-  }
-  document.getElementById('ps-prev').addEventListener('click', () => {
-    paletteIdx = (paletteIdx - 1 + PALETTES.length) % PALETTES.length; renderPalette();
-  });
-  document.getElementById('ps-next').addEventListener('click', () => {
-    paletteIdx = (paletteIdx + 1) % PALETTES.length; renderPalette();
-  });
-  function closeBgPop() { document.getElementById('bg-popover').classList.remove('open'); }
-  document.getElementById('bg-toggle').addEventListener('click', e => {
-    e.stopPropagation();
-    document.getElementById('bg-popover').classList.toggle('open');
-  });
-  document.querySelectorAll('#bg-popover .pop-swatch[data-bg]').forEach(sw => {
-    sw.addEventListener('click', e => {
-      e.stopPropagation();
-      document.querySelectorAll('#bg-popover .pop-swatch').forEach(s => s.classList.remove('selected'));
-      sw.classList.add('selected');
-      document.body.style.backgroundImage = 'none';
-      document.body.style.background = sw.dataset.bg;
-      localStorage.setItem('sh_bg', sw.dataset.bg);
-    });
-  });
-  document.getElementById('bg-upload-pop').addEventListener('click', e => {
-    e.stopPropagation();
-    const tmp = document.createElement('input'); tmp.type = 'file'; tmp.accept = 'image/*';
-    tmp.onchange = ev => {
-      const file = ev.target.files[0]; if (!file) return;
-      document.body.style.backgroundImage = `url(${URL.createObjectURL(file)})`;
-      document.body.style.backgroundSize = 'cover';
-      document.querySelectorAll('#bg-popover .pop-swatch').forEach(s => s.classList.remove('selected'));
-    };
-    tmp.click();
-  });
-  document.addEventListener('click', e => {
-    if (!e.target.closest('#float-controls')) closeBgPop();
-  });
-  const _savedBg = localStorage.getItem('sh_bg');
-  if (_savedBg) {
-    document.body.style.background = _savedBg;
-    document.querySelectorAll('#bg-popover .pop-swatch[data-bg]').forEach(s => {
-      s.classList.toggle('selected', s.dataset.bg === _savedBg);
-    });
-  } else {
-    document.querySelector('#bg-popover .pop-swatch[data-bg="#16151A"]').classList.add('selected');
-  }
-  renderPalette();
 
-  // Sort button toggle (mockup — visual only)
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyAj-pIFaW0OuDUfEbaOm_zFhu4fU9kXZbM",
+    authDomain: "dotso-fec33.firebaseapp.com",
+    projectId: "dotso-fec33",
+    storageBucket: "dotso-fec33.firebasestorage.app",
+    messagingSenderId: "202217283559",
+    appId: "1:202217283559:web:8359ebd1844657b720a742"
+  });
+  const _auth = firebase.auth();
+  const _db   = firebase.firestore();
+
+  let _currentUser  = null;
+  let _myFollowing  = new Set(); // UIDs I follow
+  let _allProfiles  = [];        // raw Firestore docs
+  let _activeFilter = '';        // tag filter
+  let _sortMode     = 'random';
+
+  const FIVE_MIN = 5 * 60 * 1000;
+
+  // ── Auth ──────────────────────────────────────────────────────────────
+  _auth.onAuthStateChanged(async user => {
+    _currentUser = user;
+    if (user) {
+      // Update lastSeen
+      _db.collection('profiles').doc(user.uid).set(
+        { lastSeen: firebase.firestore.FieldValue.serverTimestamp() },
+        { merge: true }
+      ).catch(() => {});
+
+      // Load who I follow
+      const followSnap = await _db.collection('follows')
+        .where('followerId', '==', user.uid).get().catch(() => ({ docs: [] }));
+      followSnap.docs.forEach(d => _myFollowing.add(d.data().followedId));
+    }
+    loadProfiles();
+  });
+
+  // ── Load all profiles ─────────────────────────────────────────────────
+  async function loadProfiles() {
+    const snap = await _db.collection('profiles').get().catch(() => null);
+    if (!snap) { document.getElementById('profile-grid').innerHTML = '<div class="empty-state">Could not load profiles.</div>'; return; }
+    _allProfiles = snap.docs
+      .map(d => ({ uid: d.id, ...d.data() }))
+      .filter(p => p.handle); // skip incomplete profiles
+    renderGrid();
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────
+  function renderGrid() {
+    let profiles = [..._allProfiles];
+
+    // Filter: skip own profile
+    if (_currentUser) profiles = profiles.filter(p => p.uid !== _currentUser.uid);
+
+    // Filter by active tag
+    if (_activeFilter) {
+      profiles = profiles.filter(p =>
+        (p.tags || []).some(t => t.toLowerCase().includes(_activeFilter.toLowerCase())) ||
+        (p.handle || '').toLowerCase().includes(_activeFilter.toLowerCase())
+      );
+    }
+
+    // Filter by search text
+    const q = document.getElementById('search-input').value.trim().toLowerCase();
+    if (q) {
+      profiles = profiles.filter(p =>
+        (p.handle || '').toLowerCase().includes(q) ||
+        (p.tagline || '').toLowerCase().includes(q) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort
+    const now = Date.now();
+    if (_sortMode === 'online') {
+      profiles = profiles.filter(p => {
+        const ls = p.lastSeen?.toMillis?.();
+        return ls && (now - ls) < FIVE_MIN;
+      });
+    } else if (_sortMode === 'active') {
+      profiles.sort((a, b) => {
+        const ta = a.updatedAt?.toMillis?.() || 0;
+        const tb = b.updatedAt?.toMillis?.() || 0;
+        return tb - ta;
+      });
+    } else {
+      // random — shuffle
+      for (let i = profiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [profiles[i], profiles[j]] = [profiles[j], profiles[i]];
+      }
+    }
+
+    // Update count
+    const label = _activeFilter ? ` tagged ${_activeFilter}` : '';
+    const onlineLabel = _sortMode === 'online' ? ' · online now' : '';
+    document.getElementById('result-count').textContent =
+      `[ ${profiles.length} profile${profiles.length !== 1 ? 's' : ''}${label}${onlineLabel} ]`;
+
+    // Render cards
+    const grid = document.getElementById('profile-grid');
+    if (!profiles.length) {
+      grid.innerHTML = '<div class="empty-state">No profiles found.</div>';
+      return;
+    }
+    grid.innerHTML = '';
+    profiles.forEach(p => grid.appendChild(buildCard(p)));
+  }
+
+  function buildCard(p) {
+    const isOnline = p.lastSeen?.toMillis && (Date.now() - p.lastSeen.toMillis()) < FIVE_MIN;
+    const following = _myFollowing.has(p.uid);
+    const tags = (p.tags || []).slice(0, 4);
+
+    const card = document.createElement('div');
+    card.className = 'pcard';
+    card.innerHTML = `
+      <div class="strip strip-${p.palette || 0}"></div>
+      <div class="body">
+        <div class="pname">${escHtml(p.handle || 'unknown')}</div>
+        <div class="phandle">@${escHtml(p.handle || '')}</div>
+        <div class="pline">${escHtml(p.tagline || '')}</div>
+        <div class="ptags">${tags.map(t =>
+          `<span class="ptag${_activeFilter && t.toLowerCase().includes(_activeFilter.toLowerCase()) ? ' match' : ''}">${escHtml(t)}</span>`
+        ).join('')}</div>
+      </div>
+      <div class="card-footer">
+        ${_currentUser ? `<button class="follow-btn${following ? ' following' : ''}" data-uid="${p.uid}">
+          ${following ? 'following' : '+ follow'}
+        </button>` : '<span></span>'}
+        ${isOnline ? '<span class="online-badge"><span class="online-dot"></span>online</span>' : '<span></span>'}
+      </div>`;
+
+    // Follow button
+    const followBtn = card.querySelector('.follow-btn');
+    if (followBtn) {
+      followBtn.addEventListener('click', e => { e.stopPropagation(); toggleFollow(p.uid, followBtn); });
+    }
+
+    // Card click → view profile + increment views
+    card.addEventListener('click', () => {
+      if (_currentUser) {
+        _db.collection('profiles').doc(p.uid).set(
+          { views: firebase.firestore.FieldValue.increment(1) },
+          { merge: true }
+        ).catch(() => {});
+      }
+      window.location.href = `editor-mockup.html?preview=1&viewuid=${p.uid}`;
+    });
+
+    return card;
+  }
+
+  // ── Follow / Unfollow ─────────────────────────────────────────────────
+  async function toggleFollow(targetUid, btn) {
+    if (!_currentUser) { window.location.href = 'signin.html'; return; }
+    const myUid   = _currentUser.uid;
+    const docId   = `${myUid}_${targetUid}`;
+    const followRef = _db.collection('follows').doc(docId);
+    const isFollowing = _myFollowing.has(targetUid);
+
+    btn.disabled = true;
+    if (isFollowing) {
+      await followRef.delete().catch(() => {});
+      _db.collection('profiles').doc(targetUid).set({ followerCount: firebase.firestore.FieldValue.increment(-1) }, { merge: true }).catch(() => {});
+      _db.collection('profiles').doc(myUid).set({ followingCount: firebase.firestore.FieldValue.increment(-1) }, { merge: true }).catch(() => {});
+      _myFollowing.delete(targetUid);
+      btn.textContent = '+ follow';
+      btn.classList.remove('following');
+    } else {
+      await followRef.set({ followerId: myUid, followedId: targetUid, createdAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+      _db.collection('profiles').doc(targetUid).set({ followerCount: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(() => {});
+      _db.collection('profiles').doc(myUid).set({ followingCount: firebase.firestore.FieldValue.increment(1) }, { merge: true }).catch(() => {});
+      _myFollowing.add(targetUid);
+      btn.textContent = 'following';
+      btn.classList.add('following');
+    }
+    btn.disabled = false;
+  }
+
+  // ── Search ────────────────────────────────────────────────────────────
+  let _searchTimer;
+  document.getElementById('search-input').addEventListener('input', () => {
+    clearTimeout(_searchTimer);
+    _searchTimer = setTimeout(() => {
+      const val = document.getElementById('search-input').value.trim();
+      if (val.startsWith('#') || (!val.includes(' ') && val.length > 1)) {
+        setFilter(val);
+        document.getElementById('search-input').value = '';
+      } else {
+        renderGrid();
+      }
+    }, 300);
+  });
+
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const val = e.target.value.trim();
+      if (val) { setFilter(val); e.target.value = ''; }
+    }
+  });
+
+  function setFilter(tag) {
+    _activeFilter = tag;
+    renderActiveTag();
+    renderGrid();
+  }
+
+  function renderActiveTag() {
+    const row = document.getElementById('active-tags');
+    const label = document.getElementById('browse-label');
+    // remove old tag pills
+    row.querySelectorAll('.active-tag').forEach(el => el.remove());
+    if (_activeFilter) {
+      label.style.display = '';
+      const pill = document.createElement('span');
+      pill.className = 'active-tag';
+      pill.innerHTML = `${escHtml(_activeFilter)} <span class="x">×</span>`;
+      pill.addEventListener('click', () => { _activeFilter = ''; renderActiveTag(); renderGrid(); });
+      row.appendChild(pill);
+    } else {
+      label.style.display = 'none';
+    }
+  }
+
+  // ── Sort ──────────────────────────────────────────────────────────────
   document.querySelectorAll('.sort-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      _sortMode = btn.dataset.sort;
+      renderGrid();
     });
   });
-  // Cards link to individual profiles
-  document.querySelectorAll('.pcard[data-who]').forEach(card => {
-    card.style.cursor = 'pointer';
-    card.addEventListener('click', () => window.location.href = 'profile-view.html?who=' + card.dataset.who);
-  });
+
+  // ── Utils ─────────────────────────────────────────────────────────────
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
 </script>
 </body>
 </html>

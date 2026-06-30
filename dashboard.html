@@ -359,6 +359,17 @@
       document.querySelectorAll('.nav-handle').forEach(el => el.textContent = '@' + h);
       document.getElementById('dash-name').textContent = 'Hey, ' + h + '.';
       document.getElementById('handle-display').textContent = '@' + h;
+
+      // Live counts
+      const followers = doc.exists && doc.data().followerCount ? doc.data().followerCount : 0;
+      const following = doc.exists && doc.data().followingCount ? doc.data().followingCount : 0;
+      const views     = doc.exists && doc.data().views         ? doc.data().views         : 0;
+      document.querySelector('.s-followers .stat-num').textContent = followers;
+      document.querySelector('.s-following .stat-num').textContent = following;
+      document.querySelector('.s-views .stat-num').textContent     = views;
+
+      // Update lastSeen
+      _db.collection('profiles').doc(user.uid).set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(() => {});
     } catch(e) {
       document.getElementById('dash-name').textContent = 'Hey.';
     }

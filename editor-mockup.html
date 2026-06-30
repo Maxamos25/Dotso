@@ -1686,6 +1686,14 @@
       localStorage.removeItem('sh_bg_texture');
       localStorage.removeItem('sh_bg_image');
     }
+    // Extract tags and tagline for browse/search
+    const allTags = [];
+    let tagline = '';
+    saved.forEach(b => {
+      if (b.type === 'tags' && b.tags) b.tags.forEach(t => { if (!allTags.includes(t)) allTags.push(t); });
+      if (b.type === 'identity' && b.tagline) tagline = b.tagline;
+    });
+
     // Sync to Firestore
     const _u = _auth.currentUser;
     if (_u) {
@@ -1694,9 +1702,11 @@
         palette:   paletteIdx,
         bgTexture, bgColor,
         handle:    localStorage.getItem('sh_handle') || '',
+        tags:      allTags,
+        tagline,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+        lastSeen:  firebase.firestore.FieldValue.serverTimestamp(),
       }, { merge: true }).catch(() => {});
-      // bgImage stored separately — can be large
       if (bgImage) {
         _db.collection('profiles').doc(_u.uid).set({ bgImage }, { merge: true }).catch(() => {});
       }
@@ -2365,6 +2375,9 @@
       backBtn.href = backUrl.toString();
       document.body.appendChild(backBtn);
     }
+
+    // Update lastSeen
+    if (_user) _db.collection('profiles').doc(_user.uid).set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }).catch(() => {});
 
     // Fade in canvas now that profile is loaded
     document.getElementById('content-panel').style.opacity = '1';
