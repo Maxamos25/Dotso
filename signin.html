@@ -246,7 +246,7 @@
     e.preventDefault();
     clearError();
     const form   = e.target;
-    const handle = document.getElementById('handle-input').value.trim().toLowerCase();
+    const handle = document.getElementById('handle-input').value.trim();
     const email  = form.querySelector('input[type="email"]').value.trim();
     const pass   = form.querySelector('input[type="password"]').value;
     setLoading(form, true);

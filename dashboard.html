@@ -397,7 +397,7 @@
     document.getElementById('handle-edit-row').classList.remove('open');
   }
   async function saveHandle() {
-    const val = document.getElementById('handle-input').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+    const val = document.getElementById('handle-input').value.trim().replace(/[^a-zA-Z0-9_-]/g,'');
     if (!val) return;
     const user = _auth.currentUser;
     if (user) {
