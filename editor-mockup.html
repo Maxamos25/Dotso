@@ -95,7 +95,7 @@
 
   /* ===== free canvas ===== */
   .shell{ padding: 36px 24px 0; }
-  .canvas{ position: relative; width: 100%; min-height: 1400px; overflow-x: hidden; }
+  .canvas{ position: relative; width: 100%; min-height: 1400px; overflow-x: hidden; opacity:0; transition: opacity 0.25s ease; }
 
   /* ===== blocks ===== */
   .block{
@@ -2365,6 +2365,9 @@
       backBtn.href = backUrl.toString();
       document.body.appendChild(backBtn);
     }
+
+    // Fade in canvas now that profile is loaded
+    document.getElementById('content-panel').style.opacity = '1';
 
     if (localStorage.getItem('sp_token')) startSpotifyPoll();
 
