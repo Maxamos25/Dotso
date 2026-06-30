@@ -55,13 +55,14 @@
     transition:all 0.12s;
   }
   .dash-nav-btn:hover{ border-color:rgba(255,255,255,0.25); color:var(--ink); }
-  .dash-view-btn{
+  .dash-toggle-btn{
     font-family:'JetBrains Mono',monospace; font-size:11px;
     padding:7px 16px; border-radius:8px;
     border:none; background:var(--amber); color:#1a1408;
     cursor:pointer; font-weight:600; transition:filter 0.12s;
+    position:fixed; top:18px; right:28px; z-index:30;
   }
-  .dash-view-btn:hover{ filter:brightness(1.1); }
+  .dash-toggle-btn:hover{ filter:brightness(1.1); }
 
   /* ===== overlay content ===== */
   .dash-content{
@@ -209,18 +210,6 @@
     border:1px dashed rgba(255,255,255,0.08);
   }
 
-  /* view-profile floating button (when overlay dismissed) */
-  .dash-show-btn{
-    position:fixed; bottom:28px; right:28px; z-index:20;
-    font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500;
-    padding:11px 20px; border-radius:99px;
-    background:rgba(30,29,34,0.9); border:1px solid rgba(255,255,255,0.14);
-    color:var(--ink); cursor:pointer;
-    backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
-    transition:all 0.2s; opacity:0; pointer-events:none;
-    box-shadow:0 4px 20px rgba(0,0,0,0.4);
-  }
-  .dash-show-btn.visible{ opacity:1; pointer-events:all; }
 
   /* notif bar */
   .notif-bar{
@@ -256,7 +245,6 @@
     <div class="dash-nav-right">
       <span class="dash-nav-btn nav-handle">@—</span>
       <button class="dash-nav-btn" onclick="doSignOut()">sign out</button>
-      <button class="dash-view-btn" onclick="dismissOverlay()">view my profile →</button>
     </div>
   </div>
 
@@ -347,7 +335,7 @@
 </div>
 
 <!-- Floating button to bring overlay back -->
-<button class="dash-show-btn" id="dash-show-btn" onclick="showOverlay()">☰ dashboard</button>
+<button class="dash-toggle-btn" id="dash-toggle-btn" onclick="toggleView()">profile</button>
 
 <script>
   firebase.initializeApp({
@@ -410,15 +398,12 @@
     closeHandleEdit();
   }
 
-  function dismissOverlay() {
-    document.getElementById('dash-overlay').classList.add('dismissed');
-    document.getElementById('profile-frame').style.pointerEvents = 'all';
-    document.getElementById('dash-show-btn').classList.add('visible');
-  }
-  function showOverlay() {
-    document.getElementById('dash-overlay').classList.remove('dismissed');
-    document.getElementById('profile-frame').style.pointerEvents = 'none';
-    document.getElementById('dash-show-btn').classList.remove('visible');
+  let _dashVisible = true;
+  function toggleView() {
+    _dashVisible = !_dashVisible;
+    document.getElementById('dash-overlay').classList.toggle('dismissed', !_dashVisible);
+    document.getElementById('profile-frame').style.pointerEvents = _dashVisible ? 'none' : 'all';
+    document.getElementById('dash-toggle-btn').textContent = _dashVisible ? 'profile' : 'dashboard';
   }
 
   let inspoOpen = false;
