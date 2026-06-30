@@ -134,8 +134,9 @@
       <input class="search-input" id="search-input" type="text" placeholder="search by tag or name...">
     </div>
     <div class="active-tag-row" id="active-tags">
-      <span class="active-label" id="browse-label" style="display:none;">filtering:</span>
+      <span class="active-label" id="browse-label">filtering:</span>
     </div>
+    <div class="active-tag-row" id="my-tags" style="margin-top:10px;"></div>
   </div>
 
   <div class="meta-row">
@@ -200,6 +201,25 @@
     _allProfiles = snap.docs
       .map(d => ({ uid: d.id, ...d.data() }))
       .filter(p => p.handle); // skip incomplete profiles
+
+    // Show current user's own tags as quick-filter suggestions
+    if (_currentUser) {
+      const me = _allProfiles.find(p => p.uid === _currentUser.uid);
+      if (me && me.tags && me.tags.length) {
+        const myTagsRow = document.getElementById('my-tags');
+        myTagsRow.innerHTML = '';
+        me.tags.forEach(tag => {
+          const pill = document.createElement('span');
+          pill.className = 'active-tag';
+          pill.style.borderColor = 'var(--line)';
+          pill.style.cursor = 'pointer';
+          pill.textContent = tag;
+          pill.addEventListener('click', () => { setFilter(tag); });
+          myTagsRow.appendChild(pill);
+        });
+      }
+    }
+
     renderGrid();
   }
 
@@ -337,20 +357,6 @@
   }
 
   // ── Search ────────────────────────────────────────────────────────────
-  let _searchTimer;
-  document.getElementById('search-input').addEventListener('input', () => {
-    clearTimeout(_searchTimer);
-    _searchTimer = setTimeout(() => {
-      const val = document.getElementById('search-input').value.trim();
-      if (val.startsWith('#') || (!val.includes(' ') && val.length > 1)) {
-        setFilter(val);
-        document.getElementById('search-input').value = '';
-      } else {
-        renderGrid();
-      }
-    }, 300);
-  });
-
   document.getElementById('search-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       const val = e.target.value.trim();
