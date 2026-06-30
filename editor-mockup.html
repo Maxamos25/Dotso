@@ -463,14 +463,13 @@
   .publish-label{ font-size:15px; font-weight:600; color:var(--ink); }
 
   .preview-back{
-    position:fixed; top:16px; left:16px; z-index:200;
-    font-family:'JetBrains Mono',monospace; font-size:11.5px;
-    color:var(--ink-faint); background:rgba(30,29,34,0.7);
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    border:1px solid var(--line); border-radius:8px;
-    padding:7px 14px; text-decoration:none; transition:color 0.12s;
+    position:fixed; top:28px; right:28px; z-index:200;
+    font-family:'JetBrains Mono',monospace; font-size:11px;
+    font-weight:600; color:#1a1408; background:var(--amber);
+    border:none; border-radius:8px;
+    padding:7px 16px; text-decoration:none; transition:filter 0.12s;
   }
-  .preview-back:hover{ color:var(--ink); }
+  .preview-back:hover{ filter:brightness(1.1); }
 </style>
 <script src="https://sdk.scdn.co/spotify-player.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -2352,7 +2351,7 @@
       // Back button
       const backBtn = document.createElement('a');
       backBtn.className = 'preview-back';
-      backBtn.textContent = '← back to editor';
+      backBtn.textContent = 'edit';
       const backUrl = new URL(window.location.href);
       backUrl.searchParams.delete('preview');
       backBtn.href = backUrl.toString();
