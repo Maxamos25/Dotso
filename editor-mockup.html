@@ -486,8 +486,8 @@
     <div class="editbar-right">
       <span class="save-status">saved 2s ago</span>
       <a href="template-select.html" class="btn">&#8592; templates</a>
-      <button class="btn" onclick="goPreview()">Preview</button>
-      <button class="btn primary" onclick="publishProfile()">Publish</button>
+      <a href="dashboard.html?inspo=1" class="btn">&#9825; inspiration</a>
+      <button class="btn primary" id="save-btn" onclick="doSave()">Save</button>
     </div>
   </div>
 
@@ -1600,6 +1600,13 @@
   // =====================================================================
   // PROFILE SAVE / RESTORE
   // =====================================================================
+  function doSave() {
+    saveProfile();
+    const btn = document.getElementById('save-btn');
+    btn.textContent = '✓ saved';
+    setTimeout(() => { btn.textContent = 'Save'; }, 1500);
+  }
+
   function publishProfile() {
     const overlay = document.createElement('div');
     overlay.className = 'publish-overlay';
@@ -2352,6 +2359,7 @@
       const backBtn = document.createElement('a');
       backBtn.className = 'preview-back';
       backBtn.textContent = 'edit';
+      backBtn.target = '_top';
       const backUrl = new URL(window.location.href);
       backUrl.searchParams.delete('preview');
       backBtn.href = backUrl.toString();

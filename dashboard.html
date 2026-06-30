@@ -364,6 +364,11 @@
     }
 
     updateInspoCount();
+    if (new URLSearchParams(window.location.search).get('inspo') === '1') {
+      inspoOpen = true;
+      document.getElementById('inspo-section').classList.add('active');
+      renderInspirationTab();
+    }
   });
 
   function doSignOut() { _auth.signOut().then(() => window.location.href = 'signin.html'); }
